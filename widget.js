@@ -880,7 +880,8 @@ W.links = async (w, fam) => {
     return;
   }
   w.addSpacer(8);
-  grid(w, DATA.links, 2, { font: 13, emoji: 16, padV: 9 });
+  if (fam === 'small') grid(w, DATA.links, 2, { font: 13, emoji: 16, padV: 9 });
+  else grid(w, DATA.links, 3, { font: 12, emoji: 16, padV: 12, padH: 8, gap: 6, lines: 2 });
 };
 
 // ─────────────────────────────────────────────────────────────
