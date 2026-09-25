@@ -616,18 +616,13 @@
     },
     {
       "emoji": "🌠",
-      "label": "Vision Board",
+      "label": "Our Vision Board",
       "url": "https://www.canva.com/design/DAGgeILLvrI/XRFKW68RAILiEGQhRfWCzw/edit"
     },
     {
-      "emoji": "🎧",
-      "label": "Love Potion",
-      "url": "https://open.spotify.com/playlist/3ZEuVVS4nqeXiiaHglHahx"
-    },
-    {
-      "emoji": "🗒️",
-      "label": "My Planner",
-      "url": "https://www.notion.so/my-planner-2026-13ab9075d2af808d8d39dfc769e33b32"
+      "emoji": "🤖",
+      "label": "ChatGPT",
+      "url": "https://chatgpt.com/"
     }
   ]
 }

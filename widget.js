@@ -5,10 +5,12 @@
 //
 // Widget parameters (set in Edit Widget > Parameter):
 //   photo  note  weather  countdown  together  planner  song
-//   voice  missme  clock  calendar  links
+//   voice  missme  clock  calendar  links  myspace  rates
+//   Add a number to pick which countdown: "countdown 2" is the 2nd soonest.
 
 let BASE = '';
 let DATA = null;
+let SLOT = 0; // "countdown 2" shows the 2nd soonest, for swiping through a widget stack
 
 // ─────────────────────────────────────────────────────────────
 //  THEME (matches the extension's blues)
@@ -242,13 +244,16 @@ async function songOfDay() {
     id = DATA.playlistTracks[Math.abs(h) % DATA.playlistTracks.length];
   }
   const url = `https://open.spotify.com/track/${id}`;
+  // Open the track inside our playlist, so Spotify keeps playing from it after
+  const pl = ((DATA.playlistUrl || '').match(/playlist\/(\w+)/) || [])[1];
+  const openUrl = pl ? `${url}?context=${encodeURIComponent('spotify:playlist:' + pl)}` : url;
   let info = { title: 'Song of the Day' };
   try { info = await fetchCached(`https://open.spotify.com/oembed?url=${encodeURIComponent(url)}`, `song_${id}.json`, 'json', 60 * 24 * 30); } catch (e) {}
   let art = null;
   if (info.thumbnail_url) {
     try { art = await fetchCached(info.thumbnail_url, `art_${id}.jpg`, 'image', 60 * 24 * 30); } catch (e) {}
   }
-  return { url, title: info.title || 'Song of the Day', art };
+  return { url: openUrl, title: info.title || 'Song of the Day', art };
 }
 
 async function weatherFor(p, name) {
@@ -440,21 +445,29 @@ function heroCountdown(parent, m, fam) {
 W.countdown = async (w, fam) => {
   bg(w, 'soft');
   const list = milestones();
+  w.url = BASE;
+  w.refreshAfterDate = nextMidnight();
   if (!list.length) { txt(w, 'Nothing to count down to yet 💙', F.sb(13), INK); return; }
+  const n = Math.min(SLOT, list.length - 1);
   const top = w.addStack();
   top.centerAlignContent();
   eyebrow(top, 'counting down');
+  if (list.length > 1) {
+    top.addSpacer(6);
+    txt(top, `${n + 1} of ${list.length}`, F.sb(10), INK_SOFT);
+  }
   top.addSpacer();
   if (fam !== 'small') await sticker(top, 'pengy', 28);
   w.addSpacer(6);
-  heroCountdown(w, list[0], fam);
-  if (fam === 'medium' && list[1]) {
+  heroCountdown(w, list[n], fam);
+  const after = list[n + 1];
+  if (fam === 'medium' && after) {
     w.addSpacer();
-    txt(w, `then ${list[1].emoji} ${list[1].name} in ${list[1].days}d`, F.sb(11), INK_MID, { lines: 1, scale: 0.7 });
+    txt(w, `then ${after.emoji} ${after.name} in ${after.days}d`, F.sb(11), INK_MID, { lines: 1, scale: 0.7 });
   }
   if (fam === 'large' || fam === 'extraLarge') {
     w.addSpacer(10);
-    list.slice(1, 6).forEach((m, i) => {
+    list.slice(n + 1, n + 6).forEach((m, i) => {
       if (i > 0) w.addSpacer();
       const r = w.addStack();
       r.centerAlignContent();
@@ -465,8 +478,6 @@ W.countdown = async (w, fam) => {
       txt(r, m.days === 0 ? 'today!' : `${m.days}d`, F.b(13), ACCENT);
     });
   }
-  w.url = BASE;
-  w.refreshAfterDate = nextMidnight();
 };
 
 // 💙 Together since + distance
@@ -561,34 +572,58 @@ W.song = async (w, fam) => {
   txt(pill, 'tap to play', F.sb(11), WHITE);
 };
 
-// 🎙️ Voice notes, each tile opens that mp3
+// Numbered rows like the site's voice notes list
+function noteRows(parent, notes, cols, size) {
+  for (let i = 0; i < notes.length; i += cols) {
+    if (i > 0) parent.addSpacer(4);
+    const row = parent.addStack();
+    row.spacing = 6;
+    for (let j = 0; j < cols; j++) {
+      const n = notes[i + j];
+      const cell = row.addStack();
+      cell.centerAlignContent();
+      cell.setPadding(4, 8, 4, 6);
+      cell.cornerRadius = 9;
+      if (n) {
+        cell.backgroundColor = TILE;
+        txt(cell, String(i + j + 1), F.m(size - 2), INK_SOFT);
+        cell.addSpacer(6);
+        txt(cell, n.emoji, F.r(size), INK);
+        cell.addSpacer(5);
+        txt(cell, n.label, F.sb(size), INK, { lines: 1, scale: 0.6 });
+      }
+      cell.addSpacer();
+    }
+  }
+}
+
+// 🎙️ Voice notes: "listen when…" card, tap opens the full list on the site to pick one
 W.voice = async (w, fam) => {
   bg(w, 'blush');
-  const items = DATA.voiceNotes.map(v => ({ emoji: v.emoji, label: v.label, url: BASE + v.file }));
-  if (fam === 'small') {
-    const m = items[0];
-    txt(w, '🎙️', F.r(24), INK);
-    w.addSpacer();
-    txt(w, m.label, F.b(15), INK, { lines: 2, scale: 0.7 });
-    txt(w, 'tap to hear me', F.m(11), INK_MID);
-    w.url = m.url;
-    return;
-  }
+  const notes = DATA.voiceNotes;
+  const small = fam === 'small', medium = fam === 'medium';
   const head = w.addStack();
   head.centerAlignContent();
   const ht = head.addStack();
   ht.layoutVertically();
-  eyebrow(ht, 'voice notes');
-  txt(ht, "tap one, I'm right here", F.serif(fam === 'medium' ? 13 : 16), INK_MID, { lines: 1 });
+  eyebrow(ht, '🎙️ voice notes');
+  txt(ht, 'listen when…', F.script(small ? 22 : 26), ACCENT, { lines: 1, scale: 0.6 });
   head.addSpacer();
-  await sticker(head, 'dolphin', fam === 'medium' ? 26 : 34);
-  w.addSpacer(8);
-  if (fam === 'medium') {
-    grid(w, items.slice(0, 6), 3, { font: 11, emoji: 13, padV: 6, gap: 6 });
-  } else {
-    items.push({ emoji: '💙', label: 'All notes', url: BASE });
-    grid(w, items, 2, { font: 12, emoji: 15, padV: 7 });
-  }
+  if (!small) await sticker(head, 'dolphin', medium ? 26 : 34);
+  w.addSpacer(small ? 2 : 8);
+  if (small) txt(w, `${notes.length} notes from me`, F.m(11), INK_MID);
+  else noteRows(w, medium ? notes.slice(0, 4) : notes, 2, medium ? 11 : 12);
+  w.addSpacer();
+  const pill = w.addStack();
+  pill.centerAlignContent();
+  pill.backgroundColor = new Color('#1f7bbf');
+  pill.cornerRadius = 10;
+  pill.setPadding(4, 10, 4, 10);
+  symbol(pill, 'play.fill', 10, WHITE);
+  pill.addSpacer(4);
+  const more = medium && notes.length > 4 ? `  ·  +${notes.length - 4} more` : '';
+  txt(pill, `Listen when…${more}`, F.sb(small ? 10 : 11), WHITE, { lines: 1, scale: 0.7 });
+  w.url = BASE + '#vmemoShell';
 };
 
 // 🥺 Miss me? rotates every hour, tap plays the miss-me voice note
@@ -702,12 +737,81 @@ W.calendar = async (w, fam) => {
   w.refreshAfterDate = nextMidnight();
 };
 
-// 🔗 Our links
+// 📝 Her space on the site: each tile jumps to that card
+W.myspace = async (w, fam) => {
+  bg(w, 'soft');
+  const small = fam === 'small', medium = fam === 'medium';
+  const head = w.addStack();
+  head.centerAlignContent();
+  eyebrow(head, 'my space');
+  head.addSpacer();
+  if (!small) txt(head, 'tap to open ✦', F.script(16), ACCENT);
+  w.addSpacer(8);
+  const items = [
+    { emoji: '✅', label: 'To-do list', url: BASE + '#todoList' },
+    { emoji: '📝', label: 'Scratch pad', url: BASE + '#scratchPad' },
+    { emoji: '📋', label: 'Quick copy', url: BASE + '#clipList' },
+  ];
+  if (small) grid(w, items, 1, { font: 11, emoji: 12, padV: 5, gap: 4 });
+  else if (medium) grid(w, items, 3, { font: 12, emoji: 15, padV: 14, gap: 6 });
+  else grid(w, items, 1, { font: 17, emoji: 22, padV: 20 });
+  w.url = BASE;
+};
+
+// 💱 AUD ↔ USD, live rate
+function amountRow(parent, amounts, from, to, rate) {
+  const row = parent.addStack();
+  row.spacing = 6;
+  amounts.forEach(a => {
+    const c = row.addStack();
+    c.layoutVertically();
+    c.backgroundColor = TILE;
+    c.cornerRadius = 10;
+    c.setPadding(5, 8, 5, 8);
+    txt(c, `${from}${a}`, F.m(10), INK_SOFT, { lines: 1 });
+    txt(c, `${to}${(a * rate).toFixed(2)}`, F.b(13), INK, { lines: 1, scale: 0.6 });
+    row.addSpacer();
+  });
+}
+
+W.rates = async (w, fam) => {
+  bg(w, 'soft');
+  const r = await fetchCached('https://api.frankfurter.dev/v1/latest?from=AUD&to=USD', 'rate_aud_usd.json', 'json', 180);
+  const rate = r.rates.USD;
+  const small = fam === 'small', big = fam === 'large' || fam === 'extraLarge';
+  const top = w.addStack();
+  top.centerAlignContent();
+  eyebrow(top, '💱 exchange rate');
+  top.addSpacer();
+  if (!small) await sticker(top, 'pengy', 26);
+  w.addSpacer();
+  txt(w, 'A$1 is', F.m(small ? 10 : 12), INK_MID);
+  const row = w.addStack();
+  row.bottomAlignContent();
+  txt(row, `$${rate.toFixed(2)}`, F.h(small ? 30 : 38), ACCENT, { lines: 1, scale: 0.6 });
+  row.addSpacer(4);
+  txt(row, 'USD', F.sb(12), INK_MID);
+  txt(w, `$1 USD is A$${(1 / rate).toFixed(2)}`, F.m(small ? 9 : 11), INK_SOFT, { lines: 1, scale: 0.7 });
+  if (!small) {
+    w.addSpacer(8);
+    amountRow(w, [10, 20, 50, 100], 'A$', '$', rate);
+    if (big) {
+      w.addSpacer(6);
+      amountRow(w, [10, 20, 50, 100], '$', 'A$', 1 / rate);
+    }
+  }
+  w.addSpacer();
+  txt(w, `rate from ${r.date}`, F.m(9), INK_SOFT);
+  w.url = BASE + '#audUsdRate';
+  w.refreshAfterDate = minutesFromNow(180);
+};
+
+// 🔗 Quick links
 W.links = async (w, fam) => {
   bg(w, 'soft');
   const head = w.addStack();
   head.centerAlignContent();
-  eyebrow(head, 'our links');
+  eyebrow(head, 'quick links');
   head.addSpacer();
   txt(head, 'always & forever ✦', F.script(16), ACCENT);
   w.addSpacer(8);
@@ -718,13 +822,14 @@ W.links = async (w, fam) => {
 // ─────────────────────────────────────────────────────────────
 //  ENTRY POINT
 // ─────────────────────────────────────────────────────────────
-const ALIASES = { photos: 'photo', notes: 'note', love: 'note', countdowns: 'countdown', days: 'together', notion: 'planner', music: 'song', voices: 'voice', voicenotes: 'voice', miss: 'missme', 'miss me': 'missme', clocks: 'clock', time: 'clock', cal: 'calendar', link: 'links' };
+const ALIASES = { photos: 'photo', notes: 'note', love: 'note', countdowns: 'countdown', days: 'together', notion: 'planner', music: 'song', voices: 'voice', voicenotes: 'voice', miss: 'missme', 'miss me': 'missme', clocks: 'clock', time: 'clock', cal: 'calendar', link: 'links', quicklinks: 'links', 'quick links': 'links', space: 'myspace', 'my space': 'myspace', todo: 'myspace', rate: 'rates', money: 'rates', exchange: 'rates' };
 
 const PICKER = [
   ['photo', 'large', 'Photo of us'], ['note', 'medium', 'Love note'], ['weather', 'medium', 'Weather x2'],
   ['countdown', 'large', 'Countdowns'], ['together', 'small', 'Together since'], ['planner', 'small', 'Planner'],
   ['song', 'medium', 'Song of the day'], ['voice', 'large', 'Voice notes'], ['missme', 'large', 'Miss me?'],
-  ['clock', 'small', 'Two clocks'], ['calendar', 'medium', 'Calendar'], ['links', 'large', 'Our links'],
+  ['clock', 'small', 'Two clocks'], ['calendar', 'medium', 'Calendar'], ['links', 'large', 'Quick links'],
+  ['myspace', 'medium', 'My space'], ['rates', 'medium', 'Exchange rate'],
 ];
 
 function helpWidget(param) {
@@ -761,6 +866,10 @@ async function build(type, fam) {
 async function run(opts) {
   BASE = opts.base.endsWith('/') ? opts.base : opts.base + '/';
   let type = (opts.param || '').trim().toLowerCase();
+  // A trailing number picks which one, e.g. "countdown 2"
+  const numbered = type.match(/^(.*?)[\s:#-]*(\d+)$/);
+  SLOT = 0;
+  if (numbered && numbered[1]) { type = numbered[1]; SLOT = Math.max(0, +numbered[2] - 1); }
   type = ALIASES[type] || type;
   let fam = opts.family || 'medium';
 
