@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Home screen app (iPad) -->
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Always 💙" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>Always With You 💙</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Fonts loaded via CSS @import for MV3 compatibility -->
+</head>
+<body>
+  <div class="bg-mesh" aria-hidden="true"></div>
+  <canvas class="bg-canvas" id="bgCanvas" aria-hidden="true"></canvas>
+  <div class="orb orb-1" aria-hidden="true"></div>
+  <div class="orb orb-2" aria-hidden="true"></div>
+  <div class="orb orb-3" aria-hidden="true"></div>
+  <div class="orb orb-4" aria-hidden="true"></div>
+  <div class="particles" id="particles" aria-hidden="true"></div>
+
+  <!-- SEARCH -->
+  <div class="search-wrapper">
+    <form class="search-bar" id="searchForm" action="https://www.google.com/search" method="get" autocomplete="off">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <circle cx="7.5" cy="7.5" r="5.5" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M11.5 11.5L16 16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <div class="search-input-wrap">
+        <input class="search-input" id="searchInput" type="text" name="q" placeholder="Search Google…" autocomplete="off" spellcheck="false" aria-label="Search Google"/>
+        <ul class="search-suggestions hidden" id="searchSuggestions" role="listbox"></ul>
+      </div>
+      <button class="search-submit" type="submit" aria-label="Search">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+
+  <main class="card" id="mainCard">
+    <!-- Left control: cursor switcher -->
+    <div class="top-left-controls">
+      <button class="cursor-switch-btn" id="cursorSwitchBtn" title="Switch cursor trail" aria-label="Switch cursor trail">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4 0L4 17L8 13L12 21L14 20L10 12L15 12Z"/></svg>
+      </button>
+    </div>
+
+    <!-- Right control: dark mode -->
+    <div class="top-right-controls">
+      <button class="dark-toggle" id="darkToggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+        <div class="dark-toggle__track">
+          <div class="dark-toggle__thumb">
+            <svg class="dark-toggle__moon" width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M12 8.5A5.5 5.5 0 0 1 5.5 2a5.5 5.5 0 1 0 6.5 6.5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg class="dark-toggle__sun hidden" width="11" height="11" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13M2.9 2.9l1 1M10.1 10.1l1 1M10.1 2.9l-1 1M3.9 10.1l-1 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </button>
+    </div>
+
+    <!-- Love note banner -->
+    <div class="love-note-banner" role="status" aria-live="polite">
+      <p class="love-note-text" id="loveNoteText"></p>
+    </div>
+
+    <!-- Header: title only -->
+    <header class="card__header">
+      <div class="title-lockup">
+        <span class="title-script">Always With You</span>
+        <div class="title-ribbon-sub">
+          <span class="title-ribbon-ornament">✦</span>
+          <span class="title-ribbon-text">always &amp; forever</span>
+          <span class="title-ribbon-ornament">✦</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ══ SECTION 1: Photos | Clock + Greeting + Miss Me ══ -->
+    <section class="cgs-section">
+      <!-- LEFT: Photo carousel (bigger) -->
+      <div class="cgs-carousel">
+        <div class="carousel-frame" id="carouselFrame">
+          <div class="photo-glow" aria-hidden="true"></div>
+          <div class="carousel-track" id="carouselTrack"></div>
+          <nav class="carousel-dots" id="carouselDots"></nav>
+          <button class="carousel-arrow carousel-arrow--prev" id="carouselPrev" aria-label="Previous">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="carousel-arrow carousel-arrow--next" id="carouselNext" aria-label="Next">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 2l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="carousel-empty" id="carouselEmpty">
+            <svg width="38" height="38" viewBox="0 0 38 38" fill="none" opacity=".45"><circle cx="19" cy="19" r="18.5" stroke="#9dd4f7" stroke-opacity=".5"/><path d="M10 26l5-6 4 5 3-4 6 5" stroke="#9dd4f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14.5" cy="16.5" r="2" fill="#9dd4f7" fill-opacity=".6"/></svg>
+            <p class="carousel-empty__text">Add your favorite photos</p>
+            <label class="photo-upload-btn" for="carouselUpload">Add Photos</label>
+            <input type="file" id="carouselUpload" accept="image/*" multiple hidden/>
+          </div>
+          <label class="carousel-add-btn hidden" id="carouselAddBtn" for="carouselUploadMore" title="Add more">
+            <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </label>
+          <input type="file" id="carouselUploadMore" accept="image/*" multiple hidden/>
+          <div class="frame-corner frame-corner--tl"></div>
+          <div class="frame-corner frame-corner--tr"></div>
+          <div class="frame-corner frame-corner--bl"></div>
+          <div class="frame-corner frame-corner--br"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Clock + Greeting + Miss Me -->
+      <div class="cgs-right">
+        <div class="clock-wrapper">
+          <div class="clock-face">
+            <time class="clock" id="clock">12:00:00</time>
+            <span class="clock-ampm" id="clockAmpm">AM</span>
+          </div>
+        </div>
+        <div class="time-greeting" id="timeGreeting">
+          <span class="time-greeting__icon" id="greetingIcon">🌸</span>
+          <span class="time-greeting__text" id="greetingText">Good morning</span>
+          <span class="time-greeting__icon-end" id="greetingIconEnd">🌸</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ SECTION 2: Calendar | Website + Todo ══ -->
+    <section class="cal-todo-section">
+      <!-- LEFT: Date label above calendar -->
+      <div class="cal-col">
+        <div class="cal-date" id="date"></div>
+        <div class="love-calendar" id="loveCalendar">
+          <div class="cal-nav">
+            <button class="cal-nav__btn" id="calPrev">‹</button>
+            <span class="cal-nav__label" id="calLabel">March 2026</span>
+            <button class="cal-nav__btn" id="calNext">›</button>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+      </div>
+      <!-- RIGHT: Notion (same level as date) + Todo -->
+      <div class="todo-col">
+        <div class="our-website-wrap">
+          <a class="our-website-btn" href="https://www.notion.so/my-planner-2026-13ab9075d2af808d8d39dfc769e33b32" target="_blank" rel="noopener">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1.5" y="1.5" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 4h5M4 6.5h5M4 9h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Notion
+          </a>
+        </div>
+        <div class="todo-card">
+          <div class="todo-card__header">
+            <div class="todo-card__title">
+              To-Do List
+            </div>
+            <button class="todo-toggle-btn" id="todoToggleInput">+ Add</button>
+          </div>
+          <div class="todo-progress-track">
+            <div class="todo-progress-fill" id="todoProgress" style="width:0%"></div>
+          </div>
+          <div class="todo-add-row hidden" id="todoAddRow">
+            <input class="todo-add-input" id="todoNewInput" type="text" placeholder="Any tasks?" maxlength="120" autocomplete="off"/>
+            <button class="todo-add-submit" id="todoSubmitBtn">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3.5 3.5 5.5-5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <ul class="todo-list" id="todoList" role="list"></ul>
+          <div class="todo-card__footer">
+            <span class="todo-count" id="todoCount"></span>
+            <button class="todo-clear-btn" id="todoClearDone">Clear done</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ SECTION: My Space ══ -->
+    <section class="myspace-section">
+      <div class="myspace-grid">
+        <!-- Quick copy clipboard -->
+        <div class="myspace-card">
+          <div class="myspace-card__title">📋 Quick Copy</div>
+          <div class="clip-list" id="clipList"></div>
+          <button class="clip-add-btn" id="clipAddBtn">+ Add snippet</button>
+        </div>
+        <!-- Scratch pad -->
+        <div class="myspace-card myspace-card--pad">
+          <div class="myspace-card__title">📝 Scratch Pad</div>
+          <textarea class="scratch-pad" id="scratchPad" placeholder="jot something down…" maxlength="2000"></textarea>
+          <div class="scratch-toolbar"><button class="scratch-tool-btn" id="scratchBulletBtn" title="Bullet point">• List</button><button class="scratch-tool-btn" id="scratchNumBtn" title="Numbered list">1. Number</button></div><div class="scratch-footer">
+            <span class="scratch-count" id="scratchCount">0 / 2000</span>
+            <span class="scratch-saved" id="scratchSaved"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ SECTION 2b: Weather ══ -->
+    <section class="weather-section">
+      <div class="weather-grid" id="weatherGrid">
+        <div class="weather-loading">Fetching Hornsby weather…</div>
+      </div>
+    </section>
+
+    <!-- ══ SECTION 3: Voice Notes ══ -->
+    <section class="voice-section">
+      <div class="vmemo-shell" id="vmemoShell">
+        <div class="vmemo-header">
+          <svg width="12" height="12" viewBox="0 0 13 13" fill="none"><path d="M6.5 1a2.5 2.5 0 0 1 2.5 2.5v3a2.5 2.5 0 0 1-5 0v-3A2.5 2.5 0 0 1 6.5 1z" stroke="currentColor" stroke-width="1.2"/><path d="M2 6.5a4.5 4.5 0 0 0 9 0M6.5 11v1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Voice Notes
+        </div>
+        <div class="vmemo-list" id="vmemoList"></div>
+        <div class="vmemo-player hidden" id="vmemoPlayer">
+          <button class="vmemo-play-btn" id="vmemoPlayBtn" aria-label="Play/Pause">
+            <svg class="vmemo-icon-play" width="12" height="12" viewBox="0 0 14 14" fill="none"><polygon points="3,1 13,7 3,13" fill="currentColor"/></svg>
+            <svg class="vmemo-icon-pause hidden" width="12" height="12" viewBox="0 0 14 14" fill="none"><rect x="2" y="1" width="3.5" height="12" rx="1" fill="currentColor"/><rect x="8.5" y="1" width="3.5" height="12" rx="1" fill="currentColor"/></svg>
+          </button>
+          <div class="vmemo-player-info">
+            <span class="vmemo-player-title" id="vmemoPlayerTitle">—</span>
+            <div class="vmemo-progress-wrap"><div class="vmemo-progress-bar" id="vmemoProgressBar"></div></div>
+          </div>
+          <div class="vmemo-waveform" id="vmemoWaveform" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ SECTION 4: Together Since | Our Distance ══ -->
+    <section class="stats-section">
+      <!-- Together Since -->
+      <div class="love-stats">
+        <div class="love-stats__eyebrow">💙 Together Since 💙</div>
+        <div class="love-stats__date" id="togetherSince">August 25, 2024</div>
+        <div class="love-stats__rule"></div>
+        <div class="love-stats__row">
+          <div class="love-stats__cell">
+            <span class="love-stats__value" id="daysTogether">—</span>
+            <span class="love-stats__label">duration</span>
+          </div>
+          <div class="love-stats__pipe"></div>
+          <div class="love-stats__cell">
+            <span class="love-stats__value" id="daysTotal">—</span>
+            <span class="love-stats__label">total days</span>
+          </div>
+        </div>
+        <button class="love-stats__change-btn hidden" id="setDateBtn">change date</button>
+      </div>
+
+      <!-- Our Distance -->
+      <div class="love-stats">
+        <div class="love-stats__eyebrow">💙 Our Distance 💙</div>
+        <div class="love-stats__date dist-cities">STL ↔ SYD</div>
+        <div class="love-stats__rule"></div>
+        <div class="love-stats__row">
+          <div class="love-stats__cell">
+            <span class="love-stats__value">15,687</span>
+            <span class="love-stats__label">kilometers</span>
+          </div>
+          <div class="love-stats__pipe"></div>
+          <div class="love-stats__cell">
+            <span class="love-stats__value">9,749</span>
+            <span class="love-stats__label">miles</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ══ SECTION 5: Our Links ══ -->
+    <section class="links-section">
+      <div class="links-grid">
+        <a class="link-btn link-btn--primary" href="https://iloveyoumost.lovable.app/" target="_blank" rel="noopener">
+          Our Game
+        </a>
+        <a class="link-btn" href="https://docs.google.com/presentation/d/1MMjAefnyYg4tJMepBqIxGlOhM3rNQzO4GpoqtaKd1qQ/present?slide=id.g2af65ea38a9_1_8" target="_blank" rel="noopener">
+          1st Valentines
+        </a>
+        <a class="link-btn" href="https://valentinesquestion.vercel.app/" target="_blank" rel="noopener">
+          2nd Valentines
+        </a>
+        <a class="link-btn link-btn--wide" href="https://docs.google.com/document/d/16CY6kzaU3A9GsQaM2zfB4PS1UwX-37VIFMTitgM2fT4/edit?usp=sharing" target="_blank" rel="noopener">
+          Our Book
+        </a>
+        <a class="link-btn link-btn--wide link-btn--lovenest" href="https://lovenest-futureweb.vercel.app/" target="_blank" rel="noopener">
+          Love Nest
+        </a>
+        <a class="link-btn" href="https://canva.link/wx8rz1vw0l1orud" target="_blank" rel="noopener">
+          Heart Collage
+        </a>
+        <a class="link-btn" href="https://www.canva.com/design/DAFUCtVs5c4/p7Qv805xswvmuNBgZebrPg/edit" target="_blank" rel="noopener">
+          Color Collage
+        </a>
+        <a class="link-btn" href="https://www.canva.com/design/DAGgeILLvrI/XRFKW68RAILiEGQhRfWCzw/edit" target="_blank" rel="noopener">
+          Our Vision Board
+        </a>
+      </div>
+    </section>
+
+    <!-- ══ Song of the Day ══ -->
+    <section class="song-section">
+      <div class="song-card" id="songCard">
+        <div class="song-info song-info--centered">
+          <span class="song-info__label">♫ now playing</span>
+          <span class="song-info__title" id="songTitle">Loading…</span>
+          <span class="song-info__artist" id="songArtist"></span>
+          <span class="song-info__note" id="songNote"></span>
+          <a class="love-potion-btn" href="https://open.spotify.com/playlist/3ZEuVVS4nqeXiiaHglHahx" target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+            Our Love Potion 💙
+          </a>
+        </div>
+        <div class="song-embed-wrap" id="songEmbedWrap"></div>
+      </div>
+    </section>
+
+    <!-- Milestones -->
+    <section class="milestones-section">
+      <div class="milestones-grid" id="milestonesGrid"></div>
+    </section>
+
+    <div class="green-divider"></div>
+
+    <!-- ══ SECTION: Quick Conversions ══ -->
+    <section class="conversions-section">
+      <div class="conversions-grid">
+        <!-- AUD → USD live rate -->
+        <div class="conv-card conv-card--rate">
+          <div class="conv-card__label">💱 Exchange Rate</div>
+          <div class="conv-rate-display" id="audUsdRate">Loading…</div>
+          <div class="conv-inputs">
+            <div class="conv-input-group">
+              <input class="conv-input" id="audAmountInput" type="number" value="1" min="0" />
+              <span class="conv-input-unit">AUD</span>
+            </div>
+            <span class="conv-swap-icon">⇅</span>
+            <div class="conv-input-group">
+              <input class="conv-input" id="usdAmountInput" type="number" min="0" placeholder="—" />
+              <span class="conv-input-unit">USD</span>
+            </div>
+          </div>
+          <div class="conv-rate-sub" id="audUsdSub"></div>
+        </div>
+        <!-- °C ↔ °F -->
+        <div class="conv-card">
+          <div class="conv-card__label">🌡️ Temperature</div>
+          <div class="conv-inputs">
+            <div class="conv-input-group">
+              <input class="conv-input" id="celsiusInput" type="number" placeholder="0" />
+              <span class="conv-input-unit">°C</span>
+            </div>
+            <span class="conv-swap-icon">⇅</span>
+            <div class="conv-input-group">
+              <input class="conv-input" id="fahrenheitInput" type="number" placeholder="32" />
+              <span class="conv-input-unit">°F</span>
+            </div>
+          </div>
+        </div>
+        <!-- km ↔ miles -->
+        <div class="conv-card">
+          <div class="conv-card__label">📏 Distance</div>
+          <div class="conv-inputs">
+            <div class="conv-input-group">
+              <input class="conv-input" id="kmInput" type="number" placeholder="0" />
+              <span class="conv-input-unit">km</span>
+            </div>
+            <span class="conv-swap-icon">⇅</span>
+            <div class="conv-input-group">
+              <input class="conv-input" id="milesInput" type="number" placeholder="0" />
+              <span class="conv-input-unit">mi</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="card__footer">
+      <div class="footer-line">
+        <span class="footer-ornament">✦</span>
+        <span class="footer-words">💗 Distance is nothing when you're my everything 💗</span>
+        <span class="footer-ornament">✦</span>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Date Modal -->
+  <div class="modal-overlay hidden" id="dateModalOverlay" role="dialog" aria-modal="true">
+    <div class="modal modal--small">
+      <button class="modal-close" id="dateCancelBtn" aria-label="Close">
+        <svg width="11" height="11" viewBox="0 0 12 12"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+      <div class="modal-sparkle-row"><span style="font-size:1.8rem">🗓️</span></div>
+      <h2 class="modal-title">When did you start?</h2>
+      <p class="modal-body">The day everything changed.</p>
+      <input type="date" id="startDateInput" class="date-input"/>
+      <div class="edit-actions" style="margin-top:1.4rem">
+        <button class="btn btn--ghost" id="dateCancelBtn2">Cancel</button>
+        <button class="btn btn--primary" id="saveDateBtn">Save 💙</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

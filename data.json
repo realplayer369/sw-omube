@@ -1,0 +1,633 @@
+{
+  "_howto": "Edit this file on GitHub to change her widgets. Changes show up within about an hour. Dates are YYYY-MM-DD in HER time zone (Sydney).",
+  "specialNote": {
+    "date": "",
+    "text": ""
+  },
+  "songOverride": {
+    "date": "",
+    "trackId": ""
+  },
+  "togetherSince": "2024-08-25",
+  "her": {
+    "name": "Sophie",
+    "city": "Hornsby",
+    "lat": -33.672,
+    "lon": 151.093,
+    "tz": null
+  },
+  "joshua": {
+    "name": "Joshua",
+    "city": "St. Louis",
+    "lat": 38.627,
+    "lon": -90.199,
+    "tz": "America/Chicago",
+    "utcOffsetFallback": -5
+  },
+  "distance": {
+    "label": "STL ↔ SYD",
+    "km": "15,687",
+    "mi": "9,749"
+  },
+  "photos": [
+    "1.jpg",
+    "2.jpg",
+    "3.jpg",
+    "4.jpg",
+    "5.jpg",
+    "6.jpg",
+    "7.jpg",
+    "8.jpg",
+    "9.jpg"
+  ],
+  "photoVersion": 1,
+  "photoRotateHours": 4,
+  "milestones": [
+    {
+      "emoji": "✈️",
+      "name": "Next Visit",
+      "date": ""
+    },
+    {
+      "emoji": "🎂",
+      "name": "Joshua's Birthday",
+      "month": 2,
+      "day": 7
+    },
+    {
+      "emoji": "🎂",
+      "name": "Sophie's Birthday",
+      "month": 8,
+      "day": 3
+    },
+    {
+      "emoji": "💍",
+      "name": "Our Anniversary",
+      "month": 8,
+      "day": 25
+    },
+    {
+      "emoji": "🎄",
+      "name": "Christmas",
+      "month": 12,
+      "day": 25
+    },
+    {
+      "emoji": "🎆",
+      "name": "New Year's",
+      "month": 1,
+      "day": 1,
+      "year": "next"
+    },
+    {
+      "emoji": "💒",
+      "name": "Our Wedding",
+      "month": 8,
+      "day": 25,
+      "year": 2033
+    }
+  ],
+  "specialDays": [
+    {
+      "month": 8,
+      "day": 25
+    },
+    {
+      "month": 8,
+      "day": 3
+    },
+    {
+      "month": 2,
+      "day": 7
+    }
+  ],
+  "loveNotes": [
+    "💗 If you're reading this, I'm thinking about you. 💗",
+    "💗 I wish I was there with you right now. 💗",
+    "💗 You're my favorite person in every universe. 💗",
+    "💗 The distance between us is temporary, but us? We are FOREVER. 💗",
+    "💗 Every morning I open my eyes and think of you first. 💗",
+    "💗 You make ordinary days feel like something worth celebrating. 💗",
+    "💗 I fall in love with you more every single day. 💗",
+    "💗 Even so far apart, I feel you with me. 💗",
+    "💗 You are the answer to every question I never knew I had. 💗",
+    "💗 You're the person I want to tell everything to. 💗",
+    "💗 I keep a piece of you in every moment in my life. 💗",
+    "💗 Counting down every second until I can hold you in my arms. 💗",
+    "💗 You changed what 'home' means to me. 💗",
+    "💗 I love you in ways I haven't found the words for yet. 💗",
+    "💗 The best part of my day is every part that involves you. 💗",
+    "💗 You are proof that the best things are worth waiting for. 💗",
+    "💗 I carry you in every song, every sunset, every quiet evening. 💗",
+    "💗 Being loved by you makes me the luckiest person in the world. 💗",
+    "💗 You make my heart feel full even when we're apart. 💗",
+    "💗 I hope your day is as wonderful as you make mine feel. 💗",
+    "💗 I love you the absolute mostest. Never forget that. 💗",
+    "💗 Every version of my future has you in it. 💗",
+    "💗 I want every small moment with you. All of them. 💗",
+    "💗 My favorite dreams are the ones with you. 💗",
+    "💗 You have no idea how often I think about you. 💗",
+    "💗 You are my future. My wifey. Always. No matter what. 💗",
+    "💗 Waking up knowing you exist is enough to make any day better. 💗",
+    "💗 I want to give you all the love you've always deserved. 💗",
+    "💗 Someday the distance will just be a story we tell together. 💗",
+    "💗 Everything is better because you're in my world. 💗"
+  ],
+  "missMe": [
+    {
+      "title": "Come here.",
+      "body": "I'd hug you so tight right now. The kind of hug that says everything words can't."
+    },
+    {
+      "title": "I miss you.",
+      "body": "More than this button can explain. More than any message could hold."
+    },
+    {
+      "title": "Right now?",
+      "body": "I'm thinking about you. Whatever you're doing, I just want you to know that."
+    },
+    {
+      "title": "So much.",
+      "body": "Missing you is just love overflowing with nowhere to go. So it comes right back to you."
+    },
+    {
+      "title": "Always.",
+      "body": "There's not a moment I don't wish you were here. Not one."
+    },
+    {
+      "title": "More than words.",
+      "body": "If I could reach through this screen and hold you — I would. Without a second thought."
+    },
+    {
+      "title": "Oh, endlessly.",
+      "body": "I miss the way you make everything feel warmer. The way you make everything feel like home."
+    },
+    {
+      "title": "You have no idea.",
+      "body": "How often I replay our conversations. How often I smile thinking of you."
+    },
+    {
+      "title": "Every day.",
+      "body": "But especially right now, in this quiet moment, I miss you most of all."
+    },
+    {
+      "title": "Come back.",
+      "body": "The world is a little less bright when you're not in it with me."
+    },
+    {
+      "title": "Too much.",
+      "body": "But I wouldn't trade this love for anything. Not the missing, not the distance, nothing."
+    },
+    {
+      "title": "Can I tell you something?",
+      "body": "I think about you in the spaces between everything. You live there now."
+    },
+    {
+      "title": "Of course I do.",
+      "body": "I miss you the way you miss sunshine after too many cloudy days."
+    },
+    {
+      "title": "So incredibly.",
+      "body": "Missing you is exhausting and beautiful and completely worth it."
+    },
+    {
+      "title": "Yes. Always yes.",
+      "body": "Every tab I open, every quiet moment — you're there. Always you."
+    },
+    {
+      "title": "More than you know.",
+      "body": "I'd give anything for one more hour with you. Just one."
+    },
+    {
+      "title": "Every second.",
+      "body": "But knowing you're out there loving me back makes the distance lighter."
+    },
+    {
+      "title": "Desperately.",
+      "body": "In the softest, most patient, most loving way. I miss you like a heartbeat."
+    },
+    {
+      "title": "Right this moment.",
+      "body": "I just want to sit with you, say nothing, and feel completely at home."
+    },
+    {
+      "title": "More than yesterday.",
+      "body": "And less than I will tomorrow. That's how this love goes — it only grows."
+    }
+  ],
+  "missMeVoice": "miss-me.mp3",
+  "voiceNotes": [
+    {
+      "emoji": "💗",
+      "label": "When you miss me",
+      "file": "miss-me.mp3"
+    },
+    {
+      "emoji": "😘",
+      "label": "For kisses",
+      "file": "kisses.mp3"
+    },
+    {
+      "emoji": "🥱",
+      "label": "When you're bored",
+      "file": "bored.mp3"
+    },
+    {
+      "emoji": "😴",
+      "label": "When you're sleepy",
+      "file": "sleepy.mp3"
+    },
+    {
+      "emoji": "🫂",
+      "label": "Long day",
+      "file": "long-day.mp3"
+    },
+    {
+      "emoji": "😂",
+      "label": "Want to laugh",
+      "file": "laugh.mp3"
+    },
+    {
+      "emoji": "🥺",
+      "label": "Need reassurance",
+      "file": "reassurance.mp3"
+    },
+    {
+      "emoji": "🍴",
+      "label": "When you're hungry",
+      "file": "hungry.mp3"
+    },
+    {
+      "emoji": "🔮",
+      "label": "Our future",
+      "file": "future.mp3"
+    },
+    {
+      "emoji": "😁",
+      "label": "When you're happy",
+      "file": "happy.mp3"
+    },
+    {
+      "emoji": "😔",
+      "label": "When you're sad",
+      "file": "sad.mp3"
+    },
+    {
+      "emoji": "☹️",
+      "label": "When you're pouting",
+      "file": "pouting.mp3"
+    },
+    {
+      "emoji": "🌅",
+      "label": "When you just woke up",
+      "file": "woke-up.mp3"
+    }
+  ],
+  "playlistTracks": [
+    "1is8gU4RVcN4J8xItxWoOY",
+    "1Y3LN4zO1Edc2EluIoSPJN",
+    "6BEP2k75mE8u8gHdvxV3mn",
+    "76OGwb5RA9h4FxQPT33ekc",
+    "51ZQ1vr10ffzbwIjDCwqm4",
+    "1EYqDZG3dgbecqv9JS2lUd",
+    "5mjYQaktjmjcMKcUIcqz4s",
+    "55h7vJchibLdUkxdlX3fK7",
+    "6dOtVTDdiauQNBQEDOtlAB",
+    "22PMfvdz35fFKYnJyMn077",
+    "78ZGO8OXHHBYg2ZhMNaywU",
+    "54TAOgQWiq0jBDZ1D5F8vC",
+    "5ozaEo4KGNnJgdzChs7FQi",
+    "2dPT9UxyHm71quNyj3C4YE",
+    "3hRV0jL3vUpRrcy398teAU",
+    "4HcARAxzsbIB3MqiEkejM6",
+    "4ewazQLXFTDC8XvCbhvtXs",
+    "3TfDUStpnEVIlsNlgcKQgJ",
+    "0WHi11uzahqpEtPGYCW6oQ",
+    "0GVuLQtPXFaL18ijEOqoAa",
+    "5asAkK2OiCuCdLCjqAXemz",
+    "0nJW01T7XtvILxQgC5J7Wh",
+    "2KnLkZ3z7PO3kgVGHGqDpD",
+    "1ZMiCix7XSAbfAJlEZWMCp",
+    "2qxmye6gAegTMjLKEBoR3d",
+    "6eI8B3QW20P68MCYMb4Etd",
+    "4nyF5lmSziBAt7ESAUjpbx",
+    "5WtfUKzXircvW8l5aaVZWT",
+    "5vjLSffimiIP26QG5WcN2K",
+    "1ei3hzQmrgealgRKFxIcWn",
+    "3i9UVldZOE0aD0JnyfAZZ0",
+    "2m6Ko3CY1qXNNja8AlugNc",
+    "58qX77t2VWMWcycsh9zKLc",
+    "0qvzXomUDJVaUboy2wMfiS",
+    "77MdvMx9L4ZQuLhhn3o21h",
+    "5O2P9iiztwhomNh8xkR9lJ",
+    "04S1pkp1VaIqjg8zZqknR5",
+    "7jtQIBanIiJOMS6RyCx6jZ",
+    "2eAvDnpXP5W0cVtiI0PUxV",
+    "0tgVpDi06FyKpA1z0VMD4v",
+    "1bhUWB0zJMIKr9yVPrkEuI",
+    "3vkCueOmm7xQDoJ17W1Pm3",
+    "630sXRhIcfwr2e4RdNtjKN",
+    "69vToJ9BMbbLlFZo7k7A7B",
+    "7FKkswFflI5Txc3Y4gH0IB",
+    "6Z165JvPnS8PYvGW8oLGLc",
+    "3yMC1KsTwh0ceXdIe4QQAQ",
+    "2E9viCx0hJKNKNThd2MdGQ",
+    "3F7bhRhNpY4YKrwa4kGeUz",
+    "1OU4E4HiVjdak0mL4blVWT",
+    "6yIHGmQLJxWAUZ1ZkENemN",
+    "0UauNGiFTVXTsgvVz6LBMf",
+    "0GMs3jq70wmCo12pavj4st",
+    "0bZFa5DZcx9HWx25m2Nd19",
+    "6VhuP99TE6gYNQRJIlAWFD",
+    "39fD0qvjgk8RarJnoBiDTx",
+    "3bNv3VuUOKgrf5hu3YcuRo",
+    "3di5hcvxxciiqwMH1jarhY",
+    "4OSBTYWVwsQhGLF9NHvIbR",
+    "0gplL1WMoJ6iYaPgMCL0gX",
+    "6VObnIkLVruX4UVyxWhlqm",
+    "6EIMUjQ7Q8Zr2VtIUik4He",
+    "0QzuaeCEEOV40Pn7IvKEny",
+    "3U4isOIWM3VvDubwSI3y7a",
+    "2bl81llf715VEEbAx03yvB",
+    "53QF56cjZA9RTuuMZDrSA6",
+    "0yc6Gst2xkRu0eMLeRMGCX",
+    "1TQXIltqoZ5XXyfCbAeSQQ",
+    "0eUoazaVUu4Y83USuUTz7P",
+    "5uCax9HTNlzGybIStD3vDh",
+    "55Am8neGJkdj2ADaM3aw5H",
+    "1KMEDSIl2j1NwYa9mgvMyg",
+    "6HuyP5a5QXQNWV9vf4GkUJ",
+    "7B3UAPLYAbwXVgbHSKEaTw",
+    "0Gl5s8IhMmQE5YQwM8Qx1J",
+    "5SDcksP8En1l6RtTY1wzHc",
+    "4oHQ8n9OKQ3599e8noCrDX",
+    "1VQfrKbnGSZnEFoGpfVnS8",
+    "1aelh2mNAK8D1S8rkLgIfN",
+    "4nVBt6MZDDP6tRVdQTgxJg",
+    "6Qyc6fS4DsZjB2mRW9DsQs",
+    "7ne4VBA60CxGM75vw0EYad",
+    "6sy0CvtlBXtXDd6yTW0koJ",
+    "0SpkyS1Q4MD8GaVcP5YjT4",
+    "5BqwC9kOBbqYkzdOKeXFFk",
+    "4p6MZZx5zusaVnlzclH8Ut",
+    "1MhXdlCQPnO56T57MfmaRm",
+    "5XeFesFbtLpXzIVDNQP22n",
+    "70YTBH8vOGJNMhy6186yFm",
+    "1Fid2jjqsHViMX6xNH70hE",
+    "79esEXlqqmq0GPz0xQSZTV",
+    "3QGsuHI8jO1Rx4JWLUh9jd",
+    "3be9ACTxtcL6Zm4vJRUiPG",
+    "440H25G5ApUQu9YIRnGh6L",
+    "0kR3d1kzEIkVpj4tpJjglb",
+    "4a1BeAIF3COAK52u6xwO55",
+    "5tyMJlMqaggzvuX7TtlrTe",
+    "0V5cvmTKsYmF5FmGGEAfmS",
+    "3U1TuSqHIubBA10cVP7Sk6",
+    "1Wdj4wRDYS7aT4CoPS0mAH",
+    "45ROR8UMn60YEVQnDy0uVF",
+    "2afCBiru10AFckfOa49wIa",
+    "4xqrdfXkTW4T0RauPLv3WA",
+    "6RiiSy9GzSwiyDEJDiMuKe",
+    "1lORkxEMmsCZqhoxcmk3A3",
+    "55nlbqqFVnSsArIeYSQlqx",
+    "4x5YzxjrF9wvIIXJV7TveC",
+    "2psRActEWsTlYYd7EDoyVR",
+    "7I5WT7DtpwSAhEeDLpZEfm",
+    "3T03rPwlL8NVk1yIaxeD8U",
+    "0SzvmWfOhoxZVGrmvb56YL",
+    "2GiJYvgVaD2HtM8GqD9EgQ",
+    "00qz2B2RwRPEOJIrCNloiL",
+    "1aEsTgCsv8nOjEgyEoRCpS",
+    "5ajjAnNRh8bxFvaVHzpPjh",
+    "1OBK4DltPHWoeilauCyckU",
+    "1lzvc17qKf2CyIOSWUEH4p",
+    "5kcvBnt6DPX3AMEsCx1qDh",
+    "1ZLrDPgR7mvuTco3rQK8Pk",
+    "6rG1DdPCTzGibgHliYJ4ws",
+    "1B62o4CbdL9ckGvwsz2cgn",
+    "2ASaiQWWIhao3cniyiwItc",
+    "523f4oSjrZx83XDtRLnsIw",
+    "3RWS7PGirAWLw2ISY4uhJD",
+    "1q32AhBbgDPdBr5VyCRHq6",
+    "4W4BnP8uUogCOGf3r0JeGm",
+    "0dupI7MHvlSXuIHH2YXWHC",
+    "33YWjVRW1hiipua8g6eTjV",
+    "01twL64hJwU3kAiSsUsIVa",
+    "7fzX3TDy4bKZTGGnXilgE4",
+    "1ALOR6EcFzN0AcIAzwWl2U",
+    "6KkEd4wacdXCmDLoI5xlYD",
+    "5AWVGdsk88fcsrssrAdyEN",
+    "3yHFw2lWQRLUms1Ai3SBIS",
+    "0113AqU3i034Xwb1tmNYwz",
+    "7xtsuU7WlDNmTzUQ32oQ7r",
+    "747ZJOMxHxLgpiInjD4mR1",
+    "0n3pKT2HiMJGxoAYgyezBV",
+    "7M2UiRCmybJ5fuT7Wc2iDR",
+    "0i7Ps1oPnc0IfUAeKiktY2",
+    "1q70WDsbAwdtqCQs94pPqS",
+    "10UTmRvoroe6eZ3ViwkpbN",
+    "3PsHulD1zewglcTPcEPnlk",
+    "20xJN09dBJBEImfp9NPdGb",
+    "1HbcclMpw0q2WDWpdGCKdS",
+    "4Dhic5lCf3U1nefagM5zwy",
+    "2HNbvHCoekdIiRWjhoZ9eQ",
+    "46Ga2kf5pfMcFINTIx0kXI",
+    "0Ub0MmkwDfVgWsdurCRsuZ",
+    "1CkZvm71jWLXOC5Cbtdx9D",
+    "3tcbegaaVvEVoK7TDnJEA5",
+    "30oFfpASNTO7vKGwQBsKIR",
+    "4kJT7Yj6Za01KfKHjb7mZE",
+    "0A3kG6fs1IjPtkmDTiQJDp",
+    "0uhGgihlgkmAGZvp93rUwm",
+    "2L9N0zZnd37dwF0clgxMGI",
+    "0lAn3zpOIxAIeAFc1NF86i",
+    "5avgjoyCpwlij7lgFHcvwU",
+    "3QoGtpOPqLo5TJ694qwonQ",
+    "0CmN570l8ZwQpI70oV8Avg",
+    "6KeBus2RvySJ6J5ZOOcAoj",
+    "6NgLeHmtiH12BSln4GRsDi",
+    "0dhMGnSEi6yQOvsMylbHt8",
+    "4yB1s08jEfpRMb0K07qCE9",
+    "3yuIvz5stb9v9cljhZ5Zas",
+    "1xupkmvtlZxfId3wXo4vAq",
+    "2lxBZVbkiCXC1soks2RXwV",
+    "3GDLQPZTi2iwUtXjZigZ4v",
+    "66ruS0J0SVzuaIpShVfShY",
+    "0b0hbaQZnkFDOGjOUkIbUK",
+    "4m1jesCFX1gQtIRFirfwCW",
+    "3VSYkAf6f46i5ZkXOHORq1",
+    "6cx5CvFhqN19efStehJqoW",
+    "6lvsJDZ7336YmpBzcNGhbe",
+    "5W63Zcirj6bvnTxhVIKTSK",
+    "47Slg6LuqLaX0VodpSCvPt",
+    "2plbrEY59IikOBgBGLjaoe",
+    "7mdJAkMBPkKYOLxcVPDqa0",
+    "4DSNXNrBKv2rMo30c5DyTh",
+    "2aTKrdenCq5qBOoJPFdn4P",
+    "4Cw1fQBX3TaiZQwOAyddnj",
+    "6t2SSPrM5NXn2wn3q3x3fY",
+    "3ynJS2jbfoxkDPVrs6wPvJ",
+    "0vg4WnUWvze6pBOJDTq99k",
+    "30rtOYxOV6rho3Hza6hCrg",
+    "1wVcLKdJ4AFKPhKucNvEpy",
+    "0rKtyWc8bvkriBthvHKY8d",
+    "2CepJuGl02QWDxRPc7gs0b",
+    "7q7jyVU0f0hnod8tsaUmxg",
+    "5zCunX8URvLoBHlg1Fnjv6",
+    "0u2P5u6lvoDfwTYjAADbn4",
+    "4WfV1CNg91SBp8oG0VY0VB",
+    "5l6hpyTGBK0LAAxgPnqTQL",
+    "4VuS959DSpr82t3qBqCrWG",
+    "58s4iqgXFzXhBndBkg2AaD",
+    "4IoYz8XqqdowINzfRrFnhi",
+    "0nt9QNF9rY5mPTAV9Nn9yH",
+    "6M31fPFCYB8Job3MCjjrDV",
+    "1x3W8RZxW94lrVGhP95qA6",
+    "1WVunZLZM2zLTm5rAvKZkF",
+    "4s2wGb58RztbSvjqUK8w0a",
+    "6GGtHZgBycCgGBUhZo81xe",
+    "78Sw5GDo6AlGwTwanjXbGh",
+    "2y3jy7uONOsC9qA0HfRkzu",
+    "3qvCIYvILaiHUA0Ehv8Ttb",
+    "1m8VahX3nnewYL1YR4BMBp",
+    "3GUSidbQwd7xuvU6AQorRh",
+    "3QaPy1KgI7nu9FJEQUgn6h",
+    "11DQtEraKovCRfQkSOuTVU",
+    "2WPIxceRvtnq6VtA8gjftE",
+    "5EYkide3NzE6gDIHvd4Pvz",
+    "4nvLuqwTOZdEJI1fcHXv8h",
+    "3p4hRhMcb6ch8OLtATMaLw",
+    "2hIsd0F6ZGfHCC1xa7vSad",
+    "010gJrV78swYwVNAWjmWAb",
+    "1Mhf6QIO0UuVr2ZvQPgymt",
+    "2xfRDWDKOisEXgRnYI58Tb",
+    "7Ewz6bJ97vUqk5HdkvguFQ",
+    "3Mlhgm39yBpuCwyZB8d8Md",
+    "3GhsBdS9ulPK3KCdwHRPhG",
+    "2nD9CUfMMUVxL0UyFs8fGG",
+    "4ImeysCxPlYmM4LRFp7z9f",
+    "6VJYENs5BugMc1dCVepivD",
+    "07i6kH81u4G4e7sczhvXtn",
+    "3A1kkAIXl4IPxeJRCCF4Bc",
+    "3D7AfCUJxXrc0kHOZFlsu4",
+    "3g7ngtg7xK3N9nKwAjDfH3",
+    "2nMeu6UenVvwUktBCpLMK9",
+    "1HNkqx9Ahdgi1Ixy2xkKkL",
+    "0aPZbnkMoWJaJ5CNVLCj8S",
+    "2RkZ5LkEzeHGRsmDqKwmaJ",
+    "5pgdZyYh16sAUkDjrqGPej",
+    "7wR4drNkIHfT3JkDbL5jIg",
+    "6R5fYCySNHrqo4Og6O1ppn",
+    "1qe5MsENLspkHJBrLlcFO5",
+    "1SKPmfSYaPsETbRHaiA18G",
+    "3A02hWQ2ebOFDWSbAMNnpw",
+    "6Jiexl2A8SVCdjudK9LwNC",
+    "6IfPyMb0Sxptpx6jBUATOS",
+    "1jXfVzMk8cSbvAXMML4Y4f",
+    "6epn3r7S14KUqlReYr77hA",
+    "5BZsQlgw21vDOAjoqkNgKb",
+    "3DpXBc7bzSDWA7G1lrhi7P",
+    "0eFMbKCRw8KByXyWBw8WO7",
+    "1y5h2rARaMMsNpSLIgfMfT",
+    "7gWKxBSrDUfs4dWaneLVKm",
+    "5UyfSoNyldrM2iiCGfTQuA",
+    "1KiJFIMQrRH14WF5ntkZbf",
+    "4v7DgEMw6EvYyuQ4eWFD9l",
+    "0VdikQbDdOqxdWQyYsLmne",
+    "58yKyX0kcD0l35LcQvF2vS",
+    "6QFnwOaQIMd9sZNsd4mUaO",
+    "3FvksKvphbYzLGiYG2fwRX",
+    "1BECwm5qkaBwlbfo4kpYx8",
+    "5kfNriitmkNE8mUbZ7gbq8",
+    "4EhqimHdoK9OmCNvCfioH6",
+    "4qefHyLKbyW3yeqk5Jrjey",
+    "1rWzYSHyZ5BiI4DnDRCwy7",
+    "6moU77g9RQyMzHNuKEaQKq",
+    "7lPN2DXiMsVn7XUKtOW1CS",
+    "3WD91HQDBIavSapet3ZpjG",
+    "6BFnRhvKCclDQOajt8dBGi",
+    "1o82DwNisONAd2mu1RcGE6",
+    "2mdEsXPu8ZmkHRRtAdC09e",
+    "1NZs6n6hl8UuMaX0UC0YTz",
+    "1Ist6PR2BZR3n2z2Y5R6S1",
+    "4WpvTgKsoU6efxHued4HBt",
+    "02H1K5Cw9Ar89b35XwSEw6",
+    "3gjRRs7gmh3Euynu1cau1d",
+    "5NvOZCjZaGGGL597exlQWv",
+    "2IVsRhKrx8hlQBOWy4qebo",
+    "7h4kuDm5aiJcq28qRfea8f",
+    "2g1QPpTd4o8gTAapxEUPnz",
+    "4dlXhJtGR0h75DKkE4vlD2",
+    "68RI4I6SKm57SxjG06OYvN",
+    "6EelrDeZGS0Z81NhXevtrJ",
+    "1UU3IpxOVpjjHdoQjchpgX",
+    "4Vs8RLrUdDXeaZbNeIOrtn",
+    "2RnZWwiEt6wEPvJkto2u9k",
+    "6Ozk0lA8yM2UFen3b7Ab4u",
+    "6KeYXhkIjYY6XX1bzEbcL9",
+    "1wOp7yTVyH176bW1z9WAiv",
+    "55lijDD6OAjLFFUHU9tcDm",
+    "6T8DEDkbCQEsnZZrEwQhcY",
+    "6sGIMrtIzQjdzNndVxe397",
+    "1qbmS6ep2hbBRaEZFpn7BX",
+    "20QpnulmuflvwCjXnDW8I2",
+    "2bi4wdaHb2RcGv4VF3nXIL",
+    "2u21IsdmCsny4R64kxI6E4",
+    "5y2ijHECwFYWqcAHKTZgzD",
+    "5TVirkSwFEXF1nLJEebe2I"
+  ],
+  "playlistUrl": "https://open.spotify.com/playlist/3ZEuVVS4nqeXiiaHglHahx",
+  "notionUrl": "https://www.notion.so/my-planner-2026-13ab9075d2af808d8d39dfc769e33b32",
+  "links": [
+    {
+      "emoji": "🎮",
+      "label": "Our Game",
+      "url": "https://iloveyoumost.lovable.app/"
+    },
+    {
+      "emoji": "💌",
+      "label": "1st Valentines",
+      "url": "https://docs.google.com/presentation/d/1MMjAefnyYg4tJMepBqIxGlOhM3rNQzO4GpoqtaKd1qQ/present?slide=id.g2af65ea38a9_1_8"
+    },
+    {
+      "emoji": "💝",
+      "label": "2nd Valentines",
+      "url": "https://valentinesquestion.vercel.app/"
+    },
+    {
+      "emoji": "📖",
+      "label": "Our Book",
+      "url": "https://docs.google.com/document/d/16CY6kzaU3A9GsQaM2zfB4PS1UwX-37VIFMTitgM2fT4/edit?usp=sharing"
+    },
+    {
+      "emoji": "🏡",
+      "label": "Love Nest",
+      "url": "https://lovenest-futureweb.vercel.app/"
+    },
+    {
+      "emoji": "💗",
+      "label": "Heart Collage",
+      "url": "https://canva.link/wx8rz1vw0l1orud"
+    },
+    {
+      "emoji": "🎨",
+      "label": "Color Collage",
+      "url": "https://www.canva.com/design/DAFUCtVs5c4/p7Qv805xswvmuNBgZebrPg/edit"
+    },
+    {
+      "emoji": "🌠",
+      "label": "Vision Board",
+      "url": "https://www.canva.com/design/DAGgeILLvrI/XRFKW68RAILiEGQhRfWCzw/edit"
+    },
+    {
+      "emoji": "🎧",
+      "label": "Love Potion",
+      "url": "https://open.spotify.com/playlist/3ZEuVVS4nqeXiiaHglHahx"
+    },
+    {
+      "emoji": "🗒️",
+      "label": "My Planner",
+      "url": "https://www.notion.so/my-planner-2026-13ab9075d2af808d8d39dfc769e33b32"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Always With You \ud83d\udc99",
+  "version": "4.2",
+  "description": "A romantic new tab page for long-distance love.",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://suggestqueries.google.com/*",
+    "https://api.open-meteo.com/*",
+    "https://api.frankfurter.app/*"
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;"
+  }
+}
