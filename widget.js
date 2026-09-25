@@ -15,7 +15,9 @@ let SLOT = 0; // "countdown 2" shows the 2nd soonest, for swiping through a widg
 // ─────────────────────────────────────────────────────────────
 //  THEME (matches the extension's blues)
 // ─────────────────────────────────────────────────────────────
-const dyn = (light, dark, a = 1) => Color.dynamic(new Color(light, a), new Color(dark, a));
+// Always light. Set to false to follow the iPad's dark mode again.
+const LIGHT_ONLY = true;
+const dyn = (light, dark, a = 1) => (LIGHT_ONLY ? new Color(light, a) : Color.dynamic(new Color(light, a), new Color(dark, a)));
 const INK = dyn('#1a2d3f', '#eaf5ff');
 const INK_MID = dyn('#4a6a82', '#b3cde2');
 const INK_SOFT = dyn('#8aafc8', '#7f9db5');
@@ -41,7 +43,7 @@ function bg(w, style = 'soft') {
     deep: [['#7ec8f7', '#1f5f94'], ['#1f7bbf', '#0b2c4a']],
   };
   const g = new LinearGradient();
-  g.colors = sets[style].map(([l, d]) => Color.dynamic(new Color(l), new Color(d)));
+  g.colors = sets[style].map(([l, d]) => dyn(l, d));
   g.locations = [0, 1];
   g.startPoint = new Point(0, 0);
   g.endPoint = new Point(1, 1);
@@ -76,7 +78,12 @@ function symbol(stack, name, size, color) {
   return im;
 }
 
-async function sticker(stack, name, size) {
+// A different friend in the corner each refresh
+const STICKERS = ['pengy', 'butterfly', 'dolphin', 'heart'];
+
+async function sticker(stack, size) {
+  const name = STICKERS[Math.floor(Math.random() * STICKERS.length)];
+  if (name === 'heart') return txt(stack, '💗', F.r(Math.round(size * 0.8)), PINK);
   try {
     const img = await fetchCached(`${BASE}stickers/${name}.png`, `sticker_${name}.png`, 'image', 60 * 24 * 30);
     const im = stack.addImage(img);
@@ -353,7 +360,7 @@ W.note = async (w, fam) => {
   top.centerAlignContent();
   txt(top, n.special ? 'just for today' : 'for you, today', F.script(small ? 16 : 22), ACCENT, { lines: 1, scale: 0.6 });
   top.addSpacer();
-  await sticker(top, 'butterfly', small ? 22 : 30);
+  await sticker(top, small ? 22 : 30);
   w.addSpacer();
   txt(w, n.text, F.serif(small ? 13 : big ? 24 : 17), INK, { scale: 0.5, lines: small ? 5 : 6 });
   w.addSpacer();
@@ -470,7 +477,7 @@ W.countdown = async (w, fam) => {
     txt(top, `${n + 1} of ${list.length}`, F.sb(10), INK_SOFT);
   }
   top.addSpacer();
-  if (fam !== 'small') await sticker(top, 'pengy', 28);
+  if (fam !== 'small') await sticker(top, 28);
   w.addSpacer(6);
   heroCountdown(w, list[n], fam);
   const after = list[n + 1];
@@ -504,7 +511,7 @@ W.together = async (w, fam) => {
   top.centerAlignContent();
   eyebrow(top, 'together since');
   top.addSpacer();
-  if (fam === 'small') await sticker(top, 'pengy', 26);
+  if (fam === 'small') await sticker(top, 26);
   left.addSpacer();
   txt(left, daysBetween(start, now).toLocaleString(), F.h(40), ACCENT, { lines: 1, scale: 0.6 });
   txt(left, 'days of us', F.sb(12), INK_MID);
@@ -519,7 +526,7 @@ W.together = async (w, fam) => {
     t2.centerAlignContent();
     eyebrow(t2, 'our distance');
     t2.addSpacer();
-    await sticker(t2, 'pengy', 28);
+    await sticker(t2, 28);
     right.addSpacer();
     txt(right, DATA.distance.label, F.b(15), INK);
     txt(right, `${DATA.distance.km} km`, F.h(24), ACCENT, { lines: 1, scale: 0.6 });
@@ -622,7 +629,7 @@ W.voice = async (w, fam) => {
   eyebrow(ht, '🎙️ voice notes');
   txt(ht, 'listen when…', F.script(small ? 22 : 26), ACCENT, { lines: 1, scale: 0.6 });
   head.addSpacer();
-  if (!small) await sticker(head, 'dolphin', medium ? 26 : 34);
+  if (!small) await sticker(head, medium ? 26 : 34);
   w.addSpacer(small ? 2 : 8);
   if (small) txt(w, `${notes.length} notes from me`, F.m(11), INK_MID);
   else noteRows(w, medium ? notes.slice(0, 4) : notes, 2, medium ? 11 : 12);
@@ -648,7 +655,7 @@ W.missme = async (w, fam) => {
   top.centerAlignContent();
   eyebrow(top, 'do I miss you?', PINK);
   top.addSpacer();
-  if (!small) await sticker(top, 'dolphin', medium ? 26 : 40);
+  if (!small) await sticker(top, medium ? 26 : 40);
   w.addSpacer();
   txt(w, msg.title, F.script(small ? 22 : medium ? 28 : 40), ACCENT, { lines: 1, scale: 0.5 });
   w.addSpacer(small ? 2 : 6);
