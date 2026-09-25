@@ -312,18 +312,18 @@ function grid(parent, items, cols, o = {}) {
       const tile = row.addStack();
       tile.layoutHorizontally();
       tile.centerAlignContent();
-      tile.setPadding(o.padV || 8, 10, o.padV || 8, 8);
+      tile.setPadding(o.padV || 8, o.padH || 10, o.padV || 8, o.padH || 8);
       tile.cornerRadius = 12;
       if (it) {
         tile.backgroundColor = TILE;
         tile.url = it.url;
         txt(tile, it.emoji, F.r(o.emoji || 15), INK);
-        tile.addSpacer(6);
-        txt(tile, it.label, F.sb(o.font || 12), INK, { lines: 1, scale: 0.6 });
+        tile.addSpacer(o.padH ? 4 : 6);
+        txt(tile, it.label, F.sb(o.font || 12), INK, { lines: o.lines || 1, scale: o.lines > 1 ? 0.8 : 0.6 });
       }
       tile.addSpacer();
     }
-    if (i + cols < items.length) parent.addSpacer();
+    if (i + cols < items.length) parent.addSpacer(o.rowGap);
   }
 }
 
@@ -869,10 +869,18 @@ W.links = async (w, fam) => {
   head.centerAlignContent();
   eyebrow(head, 'quick links');
   head.addSpacer();
-  txt(head, 'always & forever ✦', F.script(16), ACCENT);
+  const medium = fam === 'medium';
+  txt(head, 'always & forever ✦', F.script(medium ? 13 : 16), ACCENT);
+  if (medium) {
+    // All links in a tight 3-column grid; long names wrap instead of shrinking
+    w.setPadding(12, 14, 12, 14);
+    w.addSpacer(5);
+    grid(w, DATA.links, 3, { font: 10, emoji: 12, padV: 3, padH: 7, gap: 5, rowGap: 4, lines: 2 });
+    w.addSpacer();
+    return;
+  }
   w.addSpacer(8);
-  const items = fam === 'medium' ? DATA.links.slice(0, 6) : DATA.links;
-  grid(w, items, fam === 'medium' ? 3 : 2, fam === 'medium' ? { font: 11, emoji: 13, padV: 6, gap: 6 } : { font: 13, emoji: 16, padV: 9 });
+  grid(w, DATA.links, 2, { font: 13, emoji: 16, padV: 9 });
 };
 
 // ─────────────────────────────────────────────────────────────
