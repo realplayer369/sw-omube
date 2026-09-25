@@ -33,6 +33,7 @@ const F = {
   b: s => Font.boldRoundedSystemFont(s),
   h: s => Font.heavyRoundedSystemFont(s),
   script: s => new Font('SnellRoundhand-Bold', s),
+  comic: s => new Font('ChalkboardSE-Bold', s), // iPad has no Comic Sans; this is the closest built-in font
   serif: s => new Font('Georgia-Italic', s),
 };
 
@@ -366,13 +367,17 @@ W.photo = async (w, fam) => {
   w.refreshAfterDate = new Date((slot + 1) * block);
   // Small widgets are one big tap target, so the button only fits medium and up
   if (!DATA.snapchat || fam === 'small') return;
-  w.setPadding(14, 16, 14, 16);
+  w.setPadding(10, 10, 10, 10);
   w.addSpacer();
-  const pill = mid(w);
+  // Small button in the bottom left corner
+  const row = w.addStack();
+  const pill = row.addStack();
+  row.addSpacer();
+  pill.centerAlignContent();
   pill.backgroundColor = new Color('#FFFC00');
-  pill.cornerRadius = 14;
-  pill.setPadding(6, 14, 6, 14);
-  txt(pill, '👻  Snap me', F.b(fam === 'medium' ? 12 : 14), new Color('#000000'));
+  pill.cornerRadius = 9;
+  pill.setPadding(3, 8, 3, 8);
+  txt(pill, '👻 Snap', F.b(10), new Color('#000000'));
   pill.url = `https://www.snapchat.com/add/${encodeURIComponent(DATA.snapchat)}`;
 };
 
@@ -382,9 +387,12 @@ W.note = async (w, fam) => {
   const small = fam === 'small', big = fam === 'large' || fam === 'extraLarge';
   const n = noteOfDay();
   const top = mid(w);
-  await sticker(top, small ? 20 : 26, 'dolphin');
+  const dolphin = small ? 18 : 24;
+  await sticker(top, dolphin, 'dolphin');
   top.addSpacer(6);
-  txt(top, n.special ? 'just for today' : 'for you, today', F.script(small ? 16 : 22), ACCENT, { lines: 1, scale: 0.6 });
+  txt(top, n.special ? 'Just For Today' : 'For You Today', F.comic(small ? 13 : 18), ACCENT, { lines: 1, scale: 0.6 });
+  top.addSpacer(6);
+  await sticker(top, dolphin, 'dolphin');
   w.addSpacer();
   txt(mid(w), n.text, F.serif(small ? 13 : big ? 24 : 17), INK, { scale: 0.5, lines: small ? 5 : 6, align: 'center' });
   w.addSpacer();
