@@ -466,7 +466,7 @@ W.countdown = async (w, fam) => {
   bg(w, 'soft');
   const list = milestones();
   w.url = BASE;
-  w.refreshAfterDate = nextMidnight();
+  w.refreshAfterDate = earliest(nextMidnight(), minutesFromNow(60));
   if (!list.length) { txt(w, 'Nothing to count down to yet 💙', F.sb(13), INK); return; }
   const n = Math.min(SLOT, list.length - 1);
   const top = w.addStack();
@@ -535,7 +535,7 @@ W.together = async (w, fam) => {
     txt(right, 'and still right here', F.m(10), INK_SOFT);
   }
   w.url = BASE;
-  w.refreshAfterDate = nextMidnight();
+  w.refreshAfterDate = earliest(nextMidnight(), minutesFromNow(60));
 };
 
 // 🗒️ Notion planner shortcut
@@ -552,7 +552,7 @@ W.planner = async (w, fam) => {
 W.song = async (w, fam) => {
   const s = await songOfDay();
   w.url = s.url;
-  w.refreshAfterDate = nextMidnight();
+  w.refreshAfterDate = earliest(nextMidnight(), minutesFromNow(60));
   if (fam === 'small' && s.art) {
     w.backgroundImage = composeBackground(s.art, 'small', 0.75);
     w.setPadding(12, 12, 12, 12);
@@ -754,7 +754,7 @@ W.calendar = async (w, fam) => {
     }
   }
   w.url = BASE;
-  w.refreshAfterDate = nextMidnight();
+  w.refreshAfterDate = earliest(nextMidnight(), minutesFromNow(60));
 };
 
 // 📝 Her space on the site: each tile jumps to that card
