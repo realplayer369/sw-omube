@@ -68,6 +68,27 @@ function txt(stack, s, font, color, o = {}) {
 
 const eyebrow = (stack, s, color = ACCENT, size = 10) => txt(stack, s.toUpperCase(), F.b(size), color, { lines: 1, scale: 0.7 });
 
+// A full-width row that puts its contents in the middle
+// (Scriptable lines everything up on the left unless you do this)
+function mid(parent) {
+  const row = parent.addStack();
+  row.layoutHorizontally();
+  row.centerAlignContent();
+  row.addSpacer();
+  const inner = row.addStack();
+  inner.centerAlignContent();
+  row.addSpacer();
+  return inner;
+}
+
+// Same, but for a column of lines that are each centered
+function midCol(parent) {
+  const inner = mid(parent);
+  inner.layoutVertically();
+  inner.centerAlignContent();
+  return inner;
+}
+
 function symbol(stack, name, size, color) {
   const sym = SFSymbol.named(name);
   if (!sym) return null;
@@ -332,7 +353,7 @@ function grid(parent, items, cols, o = {}) {
 // ─────────────────────────────────────────────────────────────
 const W = {};
 
-// 📸 Rotating photo of you two
+// 📸 Rotating photo of you two, just the photo (plus a Snapchat button once a username is set)
 W.photo = async (w, fam) => {
   const hrs = DATA.photoRotateHours || 4, block = hrs * 3600000;
   const slot = Math.floor(Date.now() / block);
@@ -340,15 +361,19 @@ W.photo = async (w, fam) => {
   const file = DATA.photos[(slot + SLOT) % DATA.photos.length];
   const v = DATA.photoVersion || 1;
   const img = await fetchCached(`${BASE}${file}?v=${v}`, `photo_v${v}_${file}`, 'image', 60 * 24 * 60);
-  w.backgroundImage = composeBackground(img, fam);
-  w.setPadding(14, 16, 14, 16);
-  w.addSpacer();
-  const small = fam === 'small';
-  txt(w, 'Always With You', F.script(small ? 18 : 28), WHITE, { shadow: true, lines: 1, scale: 0.6 });
-  const days = daysBetween(parseDate(DATA.togetherSince), new Date());
-  txt(w, `day ${days.toLocaleString()} of us 💙`, F.sb(small ? 11 : 13), new Color('#ffffff', 0.92), { shadow: true, lines: 1 });
+  w.backgroundImage = composeBackground(img, fam, 0);
   w.url = BASE;
   w.refreshAfterDate = new Date((slot + 1) * block);
+  // Small widgets are one big tap target, so the button only fits medium and up
+  if (!DATA.snapchat || fam === 'small') return;
+  w.setPadding(14, 16, 14, 16);
+  w.addSpacer();
+  const pill = mid(w);
+  pill.backgroundColor = new Color('#FFFC00');
+  pill.cornerRadius = 14;
+  pill.setPadding(6, 14, 6, 14);
+  txt(pill, '👻  Snap me', F.b(fam === 'medium' ? 12 : 14), new Color('#000000'));
+  pill.url = `https://www.snapchat.com/add/${encodeURIComponent(DATA.snapchat)}`;
 };
 
 // 💌 Love note of the day (or the one Joshua set for today)
@@ -356,23 +381,23 @@ W.note = async (w, fam) => {
   bg(w, 'blush');
   const small = fam === 'small', big = fam === 'large' || fam === 'extraLarge';
   const n = noteOfDay();
-  const top = w.addStack();
-  top.centerAlignContent();
+  const top = mid(w);
+  await sticker(top, small ? 20 : 26);
+  top.addSpacer(6);
   txt(top, n.special ? 'just for today' : 'for you, today', F.script(small ? 16 : 22), ACCENT, { lines: 1, scale: 0.6 });
-  top.addSpacer();
-  await sticker(top, small ? 22 : 30);
   w.addSpacer();
-  txt(w, n.text, F.serif(small ? 13 : big ? 24 : 17), INK, { scale: 0.5, lines: small ? 5 : 6 });
+  txt(mid(w), n.text, F.serif(small ? 13 : big ? 24 : 17), INK, { scale: 0.5, lines: small ? 5 : 6, align: 'center' });
   w.addSpacer();
-  txt(w, 'love, Joshua 💙', F.m(small ? 10 : 11), INK_SOFT);
+  txt(mid(w), 'love, Joshua 💙', F.m(small ? 10 : 11), INK_SOFT);
   w.url = BASE;
   w.refreshAfterDate = earliest(nextMidnight(), minutesFromNow(30));
 };
 
 // ☀️ Weather: Hornsby vs St. Louis, with live local times
-function weatherColumn(parent, person, wx, tz, align) {
+function weatherColumn(parent, person, wx, tz) {
   const c = parent.addStack();
   c.layoutVertically();
+  c.centerAlignContent();
   eyebrow(c, `${person.name} · ${person.city}`);
   c.addSpacer(4);
   if (!wx) {
@@ -380,7 +405,7 @@ function weatherColumn(parent, person, wx, tz, align) {
     txt(c, '—°', F.b(32), INK_SOFT);
     txt(c, 'weather on its way', F.m(12), INK_MID, { lines: 1, scale: 0.7 });
     c.addSpacer(2);
-    liveClock(c, tz, F.sb(11), ACCENT);
+    liveClock(c, tz, F.sb(11), ACCENT).centerAlignText();
     return;
   }
   const cur = wx.current, info = wxInfo(cur.weather_code, cur.is_day === 1);
@@ -396,7 +421,7 @@ function weatherColumn(parent, person, wx, tz, align) {
   txt(c, info.label, F.m(12), INK_MID, { lines: 1 });
   txt(c, `H ${Math.round(wx.daily.temperature_2m_max[0])}°  L ${Math.round(wx.daily.temperature_2m_min[0])}°`, F.m(11), INK_SOFT);
   c.addSpacer(2);
-  liveClock(c, tz, F.sb(11), ACCENT);
+  liveClock(c, tz, F.sb(11), ACCENT).centerAlignText();
 }
 
 W.weather = async (w, fam) => {
@@ -407,21 +432,25 @@ W.weather = async (w, fam) => {
     weatherFor(DATA.joshua, 'wx_him.json').catch(() => null),
   ]);
   if (fam === 'small') {
-    weatherColumn(w, DATA.her, a, null);
+    weatherColumn(mid(w), DATA.her, a, null);
     w.addSpacer();
-    if (b) txt(w, `${DATA.joshua.name}: ${Math.round(b.current.temperature_2m)}° · ${wxInfo(b.current.weather_code, b.current.is_day === 1).label}`, F.sb(10), INK_SOFT, { lines: 1, scale: 0.7 });
+    if (b) txt(mid(w), `${DATA.joshua.name}: ${Math.round(b.current.temperature_2m)}° · ${wxInfo(b.current.weather_code, b.current.is_day === 1).label}`, F.sb(10), INK_SOFT, { lines: 1, scale: 0.7 });
   } else {
+    w.addSpacer();
     const row = w.addStack();
     row.centerAlignContent();
+    row.addSpacer();
     weatherColumn(row, DATA.her, a, null);
     row.addSpacer();
-    const mid = row.addStack();
-    mid.layoutVertically();
-    mid.centerAlignContent();
-    txt(mid, '💙', F.r(16), INK, { align: 'center' });
-    txt(mid, `${DATA.distance.km} km`, F.m(9), INK_SOFT, { align: 'center' });
+    const m = row.addStack();
+    m.layoutVertically();
+    m.centerAlignContent();
+    txt(m, '💙', F.r(16), INK, { align: 'center' });
+    txt(m, `${DATA.distance.km} km`, F.m(9), INK_SOFT, { align: 'center' });
     row.addSpacer();
     weatherColumn(row, DATA.joshua, b, DATA.joshua.tz);
+    row.addSpacer();
+    w.addSpacer();
   }
   w.url = BASE;
   w.refreshAfterDate = earliest(nextMidnight(), minutesFromNow(a && b ? 30 : 10));
@@ -435,31 +464,30 @@ function heroCountdown(parent, m, fam) {
   card.backgroundColor = TILE;
   card.cornerRadius = 16;
   card.setPadding(10, 12, 10, 12);
-  const head = card.addStack();
-  head.centerAlignContent();
+  const head = mid(card);
   txt(head, m.emoji, F.r(small ? 16 : 22), INK);
   head.addSpacer(6);
   const names = head.addStack();
   names.layoutVertically();
+  names.centerAlignContent();
   txt(names, m.name, F.b(small ? 13 : 16), INK, { lines: 1, scale: 0.7 });
   txt(names, fmtDate(m.date, 'd MMMM yyyy'), F.m(small ? 9 : 11), INK_SOFT, { lines: 1 });
-  head.addSpacer();
   card.addSpacer(6);
   if (m.days === 0) {
-    txt(card, 'Today! 🎉', F.h(small ? 22 : 30), PINK);
+    txt(mid(card), 'Today! 🎉', F.h(small ? 22 : 30), PINK);
     return;
   }
-  const row = card.addStack();
+  const row = mid(card);
   row.bottomAlignContent();
   txt(row, `${m.days - 1}`, F.h(small ? 28 : 40), ACCENT, { lines: 1, scale: 0.6 });
   row.addSpacer(4);
   txt(row, m.days - 1 === 1 ? 'day' : 'days', F.sb(small ? 11 : 14), INK_MID);
-  row.addSpacer();
-  const t = card.addDate(nextMidnight());
+  const t = mid(card).addDate(nextMidnight());
   t.applyTimerStyle();
+  t.centerAlignText();
   t.font = F.b(small ? 15 : 20);
   t.textColor = INK;
-  txt(card, 'hrs   min   sec', F.m(9), INK_SOFT);
+  txt(mid(card), 'hrs   min   sec', F.m(9), INK_SOFT);
 }
 
 W.countdown = async (w, fam) => {
@@ -467,23 +495,24 @@ W.countdown = async (w, fam) => {
   const list = milestones();
   w.url = BASE;
   w.refreshAfterDate = earliest(nextMidnight(), minutesFromNow(60));
-  if (!list.length) { txt(w, 'Nothing to count down to yet 💙', F.sb(13), INK); return; }
+  if (!list.length) { txt(mid(w), 'Nothing to count down to yet 💙', F.sb(13), INK); return; }
   const n = Math.min(SLOT, list.length - 1);
-  const top = w.addStack();
-  top.centerAlignContent();
+  const top = mid(w);
+  if (fam !== 'small') {
+    await sticker(top, 24);
+    top.addSpacer(6);
+  }
   eyebrow(top, 'counting down');
   if (list.length > 1) {
     top.addSpacer(6);
     txt(top, `${n + 1} of ${list.length}`, F.sb(10), INK_SOFT);
   }
-  top.addSpacer();
-  if (fam !== 'small') await sticker(top, 28);
   w.addSpacer(6);
   heroCountdown(w, list[n], fam);
   const after = list[n + 1];
   if (fam === 'medium' && after) {
     w.addSpacer();
-    txt(w, `then ${after.emoji} ${after.name} in ${after.days}d`, F.sb(11), INK_MID, { lines: 1, scale: 0.7 });
+    txt(mid(w), `then ${after.emoji} ${after.name} in ${after.days}d`, F.sb(11), INK_MID, { lines: 1, scale: 0.7 });
   }
   if (fam === 'large' || fam === 'extraLarge') {
     w.addSpacer(10);
@@ -504,35 +533,42 @@ W.countdown = async (w, fam) => {
 W.together = async (w, fam) => {
   bg(w, 'soft');
   const start = parseDate(DATA.togetherSince), now = new Date();
+  const small = fam === 'small';
   const row = w.addStack();
+  row.addSpacer();
   const left = row.addStack();
   left.layoutVertically();
+  left.centerAlignContent();
   const top = left.addStack();
   top.centerAlignContent();
+  if (small) {
+    await sticker(top, 22);
+    top.addSpacer(4);
+  }
   eyebrow(top, 'together since');
-  top.addSpacer();
-  if (fam === 'small') await sticker(top, 26);
   left.addSpacer();
   txt(left, daysBetween(start, now).toLocaleString(), F.h(40), ACCENT, { lines: 1, scale: 0.6 });
   txt(left, 'days of us', F.sb(12), INK_MID);
   left.addSpacer(4);
   txt(left, duration(start, now), F.sb(12), INK);
   txt(left, fmtDate(start, 'd MMMM yyyy'), F.m(10), INK_SOFT);
-  if (fam !== 'small') {
-    row.addSpacer(16);
+  row.addSpacer();
+  if (!small) {
     const right = row.addStack();
     right.layoutVertically();
+    right.centerAlignContent();
     const t2 = right.addStack();
     t2.centerAlignContent();
+    await sticker(t2, 24);
+    t2.addSpacer(4);
     eyebrow(t2, 'our distance');
-    t2.addSpacer();
-    await sticker(t2, 28);
     right.addSpacer();
     txt(right, DATA.distance.label, F.b(15), INK);
     txt(right, `${DATA.distance.km} km`, F.h(24), ACCENT, { lines: 1, scale: 0.6 });
     txt(right, `${DATA.distance.mi} miles`, F.sb(12), INK_MID);
     right.addSpacer(4);
     txt(right, 'and still right here', F.m(10), INK_SOFT);
+    row.addSpacer();
   }
   w.url = BASE;
   w.refreshAfterDate = earliest(nextMidnight(), minutesFromNow(60));
@@ -541,10 +577,12 @@ W.together = async (w, fam) => {
 // 🗒️ Notion planner shortcut
 W.planner = async (w, fam) => {
   bg(w, 'deep');
-  symbol(w, 'book.closed.fill', 24, WHITE);
   w.addSpacer();
-  txt(w, 'my planner', F.script(fam === 'small' ? 26 : 32), WHITE, { lines: 1, scale: 0.6 });
-  txt(w, fmtDate(new Date(), 'yyyy') + ' ✦', F.sb(13), new Color('#ffffff', 0.85));
+  symbol(mid(w), 'book.closed.fill', 24, WHITE);
+  w.addSpacer(6);
+  txt(mid(w), 'my planner', F.script(fam === 'small' ? 26 : 32), WHITE, { lines: 1, scale: 0.6 });
+  txt(mid(w), fmtDate(new Date(), 'yyyy') + ' ✦', F.sb(13), new Color('#ffffff', 0.85));
+  w.addSpacer();
   w.url = DATA.notionUrl;
 };
 
@@ -557,15 +595,14 @@ W.song = async (w, fam) => {
     w.backgroundImage = composeBackground(s.art, 'small', 0.75);
     w.setPadding(12, 12, 12, 12);
     w.addSpacer();
-    eyebrow(w, '♫ song of the day', new Color('#ffffff', 0.85), 9);
-    txt(w, s.title, F.b(14), WHITE, { lines: 2, scale: 0.7, shadow: true });
+    eyebrow(mid(w), '♫ song of the day', new Color('#ffffff', 0.85), 9);
+    txt(mid(w), s.title, F.b(14), WHITE, { lines: 2, scale: 0.7, shadow: true, align: 'center' });
     return;
   }
   bg(w, 'soft');
   const big = fam === 'large' || fam === 'extraLarge';
-  const row = w.addStack();
-  if (big) row.layoutVertically();
-  row.centerAlignContent();
+  w.addSpacer();
+  const row = big ? midCol(w) : mid(w);
   const artSize = big ? 200 : 110;
   if (s.art) {
     const im = row.addImage(s.art);
@@ -577,9 +614,10 @@ W.song = async (w, fam) => {
   row.addSpacer(big ? 12 : 14);
   const col = row.addStack();
   col.layoutVertically();
+  col.centerAlignContent();
   eyebrow(col, '♫ song of the day');
   col.addSpacer(4);
-  txt(col, s.title, F.b(big ? 20 : 17), INK, { lines: 2, scale: 0.6 });
+  txt(col, s.title, F.b(big ? 20 : 17), INK, { lines: 2, scale: 0.6, align: 'center' });
   txt(col, 'from our love potion 💙', F.m(11), INK_MID);
   col.addSpacer(8);
   const pill = col.addStack();
@@ -590,6 +628,7 @@ W.song = async (w, fam) => {
   symbol(pill, 'play.fill', 10, WHITE);
   pill.addSpacer(4);
   txt(pill, 'tap to play', F.sb(11), WHITE);
+  w.addSpacer();
 };
 
 // Numbered rows like the site's voice notes list
@@ -622,20 +661,21 @@ W.voice = async (w, fam) => {
   bg(w, 'blush');
   const notes = DATA.voiceNotes;
   const small = fam === 'small', medium = fam === 'medium';
-  const head = w.addStack();
-  head.centerAlignContent();
+  const head = mid(w);
+  if (!small) {
+    await sticker(head, medium ? 24 : 30);
+    head.addSpacer(8);
+  }
   const ht = head.addStack();
   ht.layoutVertically();
+  ht.centerAlignContent();
   eyebrow(ht, '🎙️ voice notes');
   txt(ht, 'listen when…', F.script(small ? 22 : 26), ACCENT, { lines: 1, scale: 0.6 });
-  head.addSpacer();
-  if (!small) await sticker(head, medium ? 26 : 34);
   w.addSpacer(small ? 2 : 8);
-  if (small) txt(w, `${notes.length} notes from me`, F.m(11), INK_MID);
+  if (small) txt(mid(w), `${notes.length} notes from me`, F.m(11), INK_MID);
   else noteRows(w, medium ? notes.slice(0, 4) : notes, 2, medium ? 11 : 12);
   w.addSpacer();
-  const pill = w.addStack();
-  pill.centerAlignContent();
+  const pill = mid(w);
   pill.backgroundColor = new Color('#1f7bbf');
   pill.cornerRadius = 10;
   pill.setPadding(4, 10, 4, 10);
@@ -651,18 +691,18 @@ W.missme = async (w, fam) => {
   bg(w, 'blush');
   const small = fam === 'small', medium = fam === 'medium';
   const msg = missMeNow();
-  const top = w.addStack();
-  top.centerAlignContent();
+  const top = mid(w);
   eyebrow(top, 'do I miss you?', PINK);
-  top.addSpacer();
-  if (!small) await sticker(top, medium ? 26 : 40);
+  if (!small) {
+    top.addSpacer(6);
+    await sticker(top, medium ? 24 : 34);
+  }
   w.addSpacer();
-  txt(w, msg.title, F.script(small ? 22 : medium ? 28 : 40), ACCENT, { lines: 1, scale: 0.5 });
+  txt(mid(w), msg.title, F.script(small ? 22 : medium ? 28 : 40), ACCENT, { lines: 1, scale: 0.5 });
   w.addSpacer(small ? 2 : 6);
-  txt(w, msg.body, F.serif(small ? 11 : medium ? 14 : 20), INK, { scale: 0.5, lines: small ? 4 : 5 });
+  txt(mid(w), msg.body, F.serif(small ? 11 : medium ? 14 : 20), INK, { scale: 0.5, lines: small ? 4 : 5, align: 'center' });
   w.addSpacer();
-  const pill = w.addStack();
-  pill.centerAlignContent();
+  const pill = mid(w);
   pill.backgroundColor = TILE;
   pill.cornerRadius = 10;
   pill.setPadding(4, 10, 4, 10);
@@ -678,27 +718,37 @@ function clockRow(parent, name, tz, fam, showDay) {
   const p = tzParts(new Date(), tz);
   const r = parent.addStack();
   r.layoutVertically();
+  r.centerAlignContent();
   const head = r.addStack();
   head.centerAlignContent();
   txt(head, p.h >= 6 && p.h < 18 ? '☀️' : '🌙', F.r(11), INK);
   head.addSpacer(4);
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   eyebrow(head, showDay ? `${name} · ${days[p.wd]}` : name, ACCENT, 10);
-  liveClock(r, tz, F.b(fam === 'small' ? 24 : 30), INK);
+  liveClock(r, tz, F.b(fam === 'small' ? 24 : 30), INK).centerAlignText();
 }
 
 W.clock = async (w, fam) => {
   bg(w, 'soft');
   const diff = hoursAhead();
   const her = tzParts(new Date(), null), him = tzParts(new Date(), DATA.joshua.tz);
-  const container = w.addStack();
-  if (fam === 'small') container.layoutVertically(); else container.layoutHorizontally();
-  clockRow(container, 'you', null, fam, false);
-  container.addSpacer();
-  clockRow(container, DATA.joshua.name, DATA.joshua.tz, fam, her.d !== him.d);
+  w.addSpacer();
+  if (fam === 'small') {
+    const col = midCol(w);
+    clockRow(col, 'you', null, fam, false);
+    col.addSpacer(6);
+    clockRow(col, DATA.joshua.name, DATA.joshua.tz, fam, her.d !== him.d);
+  } else {
+    const row = w.addStack();
+    row.addSpacer();
+    clockRow(row, 'you', null, fam, false);
+    row.addSpacer();
+    clockRow(row, DATA.joshua.name, DATA.joshua.tz, fam, her.d !== him.d);
+    row.addSpacer();
+  }
   w.addSpacer();
   const note = diff === 0 ? 'same time zone 💙' : `you're ${Math.abs(diff)}h ${diff > 0 ? 'ahead of' : 'behind'} him`;
-  txt(w, note, F.m(10), INK_SOFT, { lines: 1, scale: 0.7 });
+  txt(mid(w), note, F.m(10), INK_SOFT, { lines: 1, scale: 0.7 });
   w.url = BASE;
   w.refreshAfterDate = earliest(nextMidnight(), minutesFromNow(60));
 };
@@ -711,10 +761,12 @@ W.calendar = async (w, fam) => {
   const isSpecial = d => DATA.specialDays.some(s => s.month === mo + 1 && s.day === d);
   const row = w.addStack();
   row.layoutHorizontally();
+  row.addSpacer();
 
   if (fam !== 'small') {
     const left = row.addStack();
     left.layoutVertically();
+    left.centerAlignContent();
     eyebrow(left, fmtDate(now, 'EEEE'));
     txt(left, String(now.getDate()), F.h(46), ACCENT);
     txt(left, fmtDate(now, 'MMMM'), F.script(20), INK, { lines: 1, scale: 0.7 });
@@ -753,6 +805,7 @@ W.calendar = async (w, fam) => {
       txt(c, String(day), F[today || special ? 'b' : 'm'](fam === 'small' ? 8 : 10), today ? WHITE : special ? PINK : INK);
     }
   }
+  row.addSpacer();
   w.url = BASE;
   w.refreshAfterDate = earliest(nextMidnight(), minutesFromNow(60));
 };
@@ -787,6 +840,7 @@ const num = (n, d = 0) => n.toLocaleString('en-US', { minimumFractionDigits: d, 
 function convRow(parent, pairs) {
   const row = parent.addStack();
   row.spacing = 6;
+  row.addSpacer();
   pairs.forEach(([from, to]) => {
     const c = row.addStack();
     c.layoutVertically();
@@ -823,23 +877,25 @@ W.rates = async (w, fam) => {
   w.refreshAfterDate = minutesFromNow(60);
 
   if (small) {
-    eyebrow(w, 'conversions');
+    eyebrow(mid(w), 'conversions');
     w.addSpacer();
     rows.forEach((r, i) => {
       if (i > 0) w.addSpacer(6);
-      txt(w, r.head.split(' ')[0] + ' ' + r.main.replace(' USD', ''), F.sb(11), INK, { lines: 1, scale: 0.6 });
+      txt(mid(w), r.head.split(' ')[0] + ' ' + r.main.replace(' USD', ''), F.sb(11), INK, { lines: 1, scale: 0.6 });
     });
     w.addSpacer();
-    txt(w, `rate updated ${c.updated}`, F.m(9), INK_SOFT);
+    txt(mid(w), `rate updated ${c.updated}`, F.m(9), INK_SOFT);
     return;
   }
 
   if (medium) {
     const cols = w.addStack();
     cols.spacing = 8;
+    cols.addSpacer();
     rows.forEach(r => {
       const col = cols.addStack();
       col.layoutVertically();
+      col.centerAlignContent();
       col.backgroundColor = TILE;
       col.cornerRadius = 12;
       col.setPadding(8, 8, 8, 8);
@@ -849,14 +905,15 @@ W.rates = async (w, fam) => {
       col.addSpacer();
       txt(col, r.tiles[1][0] + ' = ' + r.tiles[1][1], F.m(9), INK_SOFT, { lines: 1, scale: 0.7 });
     });
+    cols.addSpacer();
     return;
   }
 
   rows.forEach((r, i) => {
     if (i > 0) w.addSpacer();
-    eyebrow(w, r.head);
-    txt(w, r.main, F.b(16), INK, { lines: 1, scale: 0.6 });
-    if (r.sub) txt(w, r.sub, F.m(10), INK_SOFT, { lines: 1, scale: 0.7 });
+    eyebrow(mid(w), r.head);
+    txt(mid(w), r.main, F.b(16), INK, { lines: 1, scale: 0.6 });
+    if (r.sub) txt(mid(w), r.sub, F.m(10), INK_SOFT, { lines: 1, scale: 0.7 });
     w.addSpacer(4);
     convRow(w, r.tiles);
   });
