@@ -366,9 +366,17 @@ W.note = async (w, fam) => {
 function weatherColumn(parent, person, wx, tz, align) {
   const c = parent.addStack();
   c.layoutVertically();
-  const cur = wx.current, info = wxInfo(cur.weather_code, cur.is_day === 1);
   eyebrow(c, `${person.name} · ${person.city}`);
   c.addSpacer(4);
+  if (!wx) {
+    // Weather didn't load this time: keep the clock, try again soon
+    txt(c, '—°', F.b(32), INK_SOFT);
+    txt(c, 'weather on its way', F.m(12), INK_MID, { lines: 1, scale: 0.7 });
+    c.addSpacer(2);
+    liveClock(c, tz, F.sb(11), ACCENT);
+    return;
+  }
+  const cur = wx.current, info = wxInfo(cur.weather_code, cur.is_day === 1);
   const r = c.addStack();
   r.centerAlignContent();
   symbol(r, info.sym, 26, info.sunny ? new Color('#f5b83d') : new Color('#45a8e8'));
@@ -386,11 +394,15 @@ function weatherColumn(parent, person, wx, tz, align) {
 
 W.weather = async (w, fam) => {
   bg(w, 'soft');
-  const [a, b] = await Promise.all([weatherFor(DATA.her, 'wx_her.json'), weatherFor(DATA.joshua, 'wx_him.json')]);
+  // One slow request shouldn't blank the whole widget
+  const [a, b] = await Promise.all([
+    weatherFor(DATA.her, 'wx_her.json').catch(() => null),
+    weatherFor(DATA.joshua, 'wx_him.json').catch(() => null),
+  ]);
   if (fam === 'small') {
     weatherColumn(w, DATA.her, a, null);
     w.addSpacer();
-    txt(w, `${DATA.joshua.name}: ${Math.round(b.current.temperature_2m)}° · ${wxInfo(b.current.weather_code, b.current.is_day === 1).label}`, F.sb(10), INK_SOFT, { lines: 1, scale: 0.7 });
+    if (b) txt(w, `${DATA.joshua.name}: ${Math.round(b.current.temperature_2m)}° · ${wxInfo(b.current.weather_code, b.current.is_day === 1).label}`, F.sb(10), INK_SOFT, { lines: 1, scale: 0.7 });
   } else {
     const row = w.addStack();
     row.centerAlignContent();
@@ -405,7 +417,7 @@ W.weather = async (w, fam) => {
     weatherColumn(row, DATA.joshua, b, DATA.joshua.tz);
   }
   w.url = BASE;
-  w.refreshAfterDate = earliest(nextMidnight(), minutesFromNow(30));
+  w.refreshAfterDate = earliest(nextMidnight(), minutesFromNow(a && b ? 30 : 10));
 };
 
 // ⏳ Countdowns, the top one ticks live
