@@ -99,11 +99,11 @@ function symbol(stack, name, size, color) {
   return im;
 }
 
-// A different friend in the corner each refresh
+// Each widget has its own friend; leave the name off for a random one each refresh
 const STICKERS = ['pengy', 'butterfly', 'dolphin', 'heart'];
 
-async function sticker(stack, size) {
-  const name = STICKERS[Math.floor(Math.random() * STICKERS.length)];
+async function sticker(stack, size, pick) {
+  const name = pick || STICKERS[Math.floor(Math.random() * STICKERS.length)];
   if (name === 'heart') return txt(stack, '💗', F.r(Math.round(size * 0.8)), PINK);
   try {
     const img = await fetchCached(`${BASE}stickers/${name}.png`, `sticker_${name}.png`, 'image', 60 * 24 * 30);
@@ -382,7 +382,7 @@ W.note = async (w, fam) => {
   const small = fam === 'small', big = fam === 'large' || fam === 'extraLarge';
   const n = noteOfDay();
   const top = mid(w);
-  await sticker(top, small ? 20 : 26);
+  await sticker(top, small ? 20 : 26, 'dolphin');
   top.addSpacer(6);
   txt(top, n.special ? 'just for today' : 'for you, today', F.script(small ? 16 : 22), ACCENT, { lines: 1, scale: 0.6 });
   w.addSpacer();
@@ -499,7 +499,7 @@ W.countdown = async (w, fam) => {
   const n = Math.min(SLOT, list.length - 1);
   const top = mid(w);
   if (fam !== 'small') {
-    await sticker(top, 24);
+    await sticker(top, 24, 'butterfly');
     top.addSpacer(6);
   }
   eyebrow(top, 'counting down');
@@ -542,7 +542,7 @@ W.together = async (w, fam) => {
   const top = left.addStack();
   top.centerAlignContent();
   if (small) {
-    await sticker(top, 22);
+    await sticker(top, 22, 'pengy');
     top.addSpacer(4);
   }
   eyebrow(top, 'together since');
@@ -559,7 +559,7 @@ W.together = async (w, fam) => {
     right.centerAlignContent();
     const t2 = right.addStack();
     t2.centerAlignContent();
-    await sticker(t2, 24);
+    await sticker(t2, 24, 'pengy');
     t2.addSpacer(4);
     eyebrow(t2, 'our distance');
     right.addSpacer();
@@ -663,7 +663,7 @@ W.voice = async (w, fam) => {
   const small = fam === 'small', medium = fam === 'medium';
   const head = mid(w);
   if (!small) {
-    await sticker(head, medium ? 24 : 30);
+    await sticker(head, medium ? 24 : 30, 'heart');
     head.addSpacer(8);
   }
   const ht = head.addStack();
