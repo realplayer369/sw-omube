@@ -6,7 +6,7 @@
     var el = id && document.getElementById(id);
     if (!el) return;
     var card = el.closest('.vmemo-shell, .todo-card, .myspace-card, .conv-card') || el;
-    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    card.scrollIntoView({ block: 'start' });
   }
   window.addEventListener('load', function () { setTimeout(go, 700); });
   window.addEventListener('hashchange', go);
