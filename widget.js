@@ -11,6 +11,7 @@
 let BASE = '';
 let DATA = null;
 let SLOT = 0; // "countdown 2" shows the 2nd soonest, for swiping through a widget stack
+const VERSION = 'Sep 25 · light'; // shown in the preview menu, so you can tell which copy her iPad is running
 
 // ─────────────────────────────────────────────────────────────
 //  THEME (matches the extension's blues)
@@ -1006,7 +1007,7 @@ async function run(opts) {
   if (!opts.inWidget) {
     const a = new Alert();
     a.title = 'Always With You 💙';
-    a.message = 'Preview a widget';
+    a.message = `Preview a widget\nversion: ${VERSION}`;
     PICKER.forEach(p => a.addAction(`${p[2]}  (${p[1]})`));
     a.addCancelAction('Close');
     const i = await a.presentSheet();
