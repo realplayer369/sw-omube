@@ -758,52 +758,88 @@ W.myspace = async (w, fam) => {
   w.url = BASE;
 };
 
-// 💱 AUD ↔ USD, live rate
-function amountRow(parent, amounts, from, to, rate) {
+// 💱 Quick conversions: exchange rate, temperature, distance (same three as the site)
+const toF = c => Math.round(c * 9 / 5 + 32);
+const toMi = km => km * 0.621371;
+const num = (n, d = 0) => n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+
+// Row of small "from / to" tiles
+function convRow(parent, pairs) {
   const row = parent.addStack();
   row.spacing = 6;
-  amounts.forEach(a => {
+  pairs.forEach(([from, to]) => {
     const c = row.addStack();
     c.layoutVertically();
     c.backgroundColor = TILE;
     c.cornerRadius = 10;
-    c.setPadding(5, 8, 5, 8);
-    txt(c, `${from}${a}`, F.m(10), INK_SOFT, { lines: 1 });
-    txt(c, `${to}${(a * rate).toFixed(2)}`, F.b(13), INK, { lines: 1, scale: 0.6 });
-    row.addSpacer();
+    c.setPadding(4, 8, 4, 8);
+    txt(c, from, F.m(10), INK_SOFT, { lines: 1, scale: 0.7 });
+    txt(c, to, F.b(12), INK, { lines: 1, scale: 0.6 });
   });
+  row.addSpacer();
+}
+
+async function conversions() {
+  const r = await fetchCached('https://api.frankfurter.dev/v1/latest?from=AUD&to=USD', 'rate_aud_usd.json', 'json', 180);
+  let herC = null;
+  try { herC = Math.round((await weatherFor(DATA.her, 'wx_her.json')).current.temperature_2m); } catch (e) {}
+  const km = Number(String(DATA.distance.km).replace(/,/g, ''));
+  return { rate: r.rates.USD, updated: fmtDate(parseDate(r.date), 'd MMM'), herC, km };
 }
 
 W.rates = async (w, fam) => {
   bg(w, 'soft');
-  const r = await fetchCached('https://api.frankfurter.dev/v1/latest?from=AUD&to=USD', 'rate_aud_usd.json', 'json', 180);
-  const rate = r.rates.USD;
-  const small = fam === 'small', big = fam === 'large' || fam === 'extraLarge';
-  const top = w.addStack();
-  top.centerAlignContent();
-  eyebrow(top, '💱 exchange rate');
-  top.addSpacer();
-  if (!small) await sticker(top, 'pengy', 26);
-  w.addSpacer();
-  txt(w, 'A$1 is', F.m(small ? 10 : 12), INK_MID);
-  const row = w.addStack();
-  row.bottomAlignContent();
-  txt(row, `$${rate.toFixed(2)}`, F.h(small ? 30 : 38), ACCENT, { lines: 1, scale: 0.6 });
-  row.addSpacer(4);
-  txt(row, 'USD', F.sb(12), INK_MID);
-  txt(w, `$1 USD is A$${(1 / rate).toFixed(2)}`, F.m(small ? 9 : 11), INK_SOFT, { lines: 1, scale: 0.7 });
-  if (!small) {
-    w.addSpacer(8);
-    amountRow(w, [10, 20, 50, 100], 'A$', '$', rate);
-    if (big) {
-      w.addSpacer(6);
-      amountRow(w, [10, 20, 50, 100], '$', 'A$', 1 / rate);
-    }
-  }
-  w.addSpacer();
-  txt(w, `rate from ${r.date}`, F.m(9), INK_SOFT);
+  const c = await conversions();
+  const small = fam === 'small', medium = fam === 'medium';
+  const rows = [
+    { head: '💱 exchange rate', main: `A$1 = $${c.rate.toFixed(4)} USD`, sub: `$1 = A$${(1 / c.rate).toFixed(4)} · updated ${c.updated}`,
+      tiles: [10, 20, 50, 100].map(a => [`A$${a}`, `$${(a * c.rate).toFixed(2)}`]) },
+    { head: '🌡️ temperature', main: c.herC == null ? '20°C = 68°F' : `${c.herC}°C = ${toF(c.herC)}°F`, sub: c.herC == null ? '' : `right now in ${DATA.her.city}`,
+      tiles: [0, 10, 20, 30].map(t => [`${t}°C`, `${toF(t)}°F`]) },
+    { head: '📏 distance', main: `${DATA.distance.km} km = ${DATA.distance.mi} mi`, sub: `${DATA.distance.label}, and still right here`,
+      tiles: [1, 5, 10, 100].map(k => [`${k} km`, `${num(toMi(k), 1)} mi`]) },
+  ];
   w.url = BASE + '#audUsdRate';
-  w.refreshAfterDate = minutesFromNow(180);
+  w.refreshAfterDate = minutesFromNow(60);
+
+  if (small) {
+    eyebrow(w, 'conversions');
+    w.addSpacer();
+    rows.forEach((r, i) => {
+      if (i > 0) w.addSpacer(6);
+      txt(w, r.head.split(' ')[0] + ' ' + r.main.replace(' USD', ''), F.sb(11), INK, { lines: 1, scale: 0.6 });
+    });
+    w.addSpacer();
+    txt(w, `rate updated ${c.updated}`, F.m(9), INK_SOFT);
+    return;
+  }
+
+  if (medium) {
+    const cols = w.addStack();
+    cols.spacing = 8;
+    rows.forEach(r => {
+      const col = cols.addStack();
+      col.layoutVertically();
+      col.backgroundColor = TILE;
+      col.cornerRadius = 12;
+      col.setPadding(8, 8, 8, 8);
+      eyebrow(col, r.head, ACCENT, 9);
+      col.addSpacer();
+      r.main.replace(' USD', '').split(' = ').forEach((part, i) => txt(col, i ? `= ${part}` : part, F.b(i ? 13 : 15), i ? ACCENT : INK, { lines: 1, scale: 0.5 }));
+      col.addSpacer();
+      txt(col, r.tiles[1][0] + ' = ' + r.tiles[1][1], F.m(9), INK_SOFT, { lines: 1, scale: 0.7 });
+    });
+    return;
+  }
+
+  rows.forEach((r, i) => {
+    if (i > 0) w.addSpacer();
+    eyebrow(w, r.head);
+    txt(w, r.main, F.b(16), INK, { lines: 1, scale: 0.6 });
+    if (r.sub) txt(w, r.sub, F.m(10), INK_SOFT, { lines: 1, scale: 0.7 });
+    w.addSpacer(4);
+    convRow(w, r.tiles);
+  });
 };
 
 // 🔗 Quick links
@@ -822,14 +858,14 @@ W.links = async (w, fam) => {
 // ─────────────────────────────────────────────────────────────
 //  ENTRY POINT
 // ─────────────────────────────────────────────────────────────
-const ALIASES = { photos: 'photo', notes: 'note', love: 'note', countdowns: 'countdown', days: 'together', notion: 'planner', music: 'song', voices: 'voice', voicenotes: 'voice', miss: 'missme', 'miss me': 'missme', clocks: 'clock', time: 'clock', cal: 'calendar', link: 'links', quicklinks: 'links', 'quick links': 'links', space: 'myspace', 'my space': 'myspace', todo: 'myspace', rate: 'rates', money: 'rates', exchange: 'rates' };
+const ALIASES = { photos: 'photo', notes: 'note', love: 'note', countdowns: 'countdown', days: 'together', notion: 'planner', music: 'song', voices: 'voice', voicenotes: 'voice', miss: 'missme', 'miss me': 'missme', clocks: 'clock', time: 'clock', cal: 'calendar', link: 'links', quicklinks: 'links', 'quick links': 'links', space: 'myspace', 'my space': 'myspace', todo: 'myspace', rate: 'rates', money: 'rates', exchange: 'rates', conversions: 'rates', convert: 'rates' };
 
 const PICKER = [
   ['photo', 'large', 'Photo of us'], ['note', 'medium', 'Love note'], ['weather', 'medium', 'Weather x2'],
   ['countdown', 'large', 'Countdowns'], ['together', 'small', 'Together since'], ['planner', 'small', 'Planner'],
   ['song', 'medium', 'Song of the day'], ['voice', 'large', 'Voice notes'], ['missme', 'large', 'Miss me?'],
   ['clock', 'small', 'Two clocks'], ['calendar', 'medium', 'Calendar'], ['links', 'large', 'Quick links'],
-  ['myspace', 'medium', 'My space'], ['rates', 'medium', 'Exchange rate'],
+  ['myspace', 'medium', 'My space'], ['rates', 'medium', 'Conversions'],
 ];
 
 function helpWidget(param) {
