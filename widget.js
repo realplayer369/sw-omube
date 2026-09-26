@@ -6,7 +6,7 @@
 // Widget parameters (set in Edit Widget > Parameter):
 //   photo  note  weather  countdown  together  planner  song
 //   voice  missme  clock  calendar  links  myspace  rates
-//   Add a number to pick which one: "countdown 2" is the 2nd soonest, "photo 2" shows 2.jpg.
+//   Add a number to pick which one: "countdown 2" is the 2nd soonest, "photo 2" shows the 2nd photo.
 
 let BASE = '';
 let DATA = null;
@@ -363,8 +363,8 @@ const W = {};
 W.photo = async (w, fam) => {
   const hrs = DATA.photoRotateHours || 4, block = hrs * 3600000;
   const slot = Math.floor(Date.now() / block);
-  // "photo 4" shows 4.jpg. Numbers listed in photoSets (data.json) rotate through their own photos instead.
-  // Plain "photo" counts as "photo 1".
+  // "photo 4" shows the 4th photo in data.json's photos list and stays put.
+  // Numbers listed in photoSets (data.json) rotate through their own photos instead. Plain "photo" counts as "photo 1".
   const n = SLOT + 1;
   const set = (DATA.photoSets || {})[n] || [DATA.photos[n - 1] || DATA.photos[slot % DATA.photos.length]];
   const file = set[slot % set.length];
