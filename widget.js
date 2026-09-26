@@ -306,7 +306,9 @@ function wxInfo(code, isDay) {
 }
 
 // Photo filled to the widget's shape with a soft dark fade at the bottom
-function composeBackground(img, family, fade = 0.6) {
+// focus is [x, y] from 0 to 1: which part of the photo to keep when it's cropped to the widget.
+// [0.5, 0.5] is the middle, [0, 1] keeps the bottom-left corner.
+function composeBackground(img, family, fade = 0.6, focus = [0.5, 0.5]) {
   const A = { small: [1, 1], medium: [2.13, 1], large: [1, 1.05], extraLarge: [2.13, 1.05] }[family] || [1, 1];
   const H = 700, W = Math.round(H * A[0] / A[1]);
   const ctx = new DrawContext();
@@ -315,7 +317,7 @@ function composeBackground(img, family, fade = 0.6) {
   ctx.respectScreenScale = false;
   const s = Math.max(W / img.size.width, H / img.size.height);
   const dw = img.size.width * s, dh = img.size.height * s;
-  ctx.drawImageInRect(img, new Rect((W - dw) / 2, (H - dh) / 2, dw, dh));
+  ctx.drawImageInRect(img, new Rect((W - dw) * focus[0], (H - dh) * focus[1], dw, dh));
   const start = H * 0.45, steps = 40, sh = (H - start) / steps;
   for (let i = 0; i < steps; i++) {
     ctx.setFillColor(new Color('#0b1d30', fade * Math.pow(i / steps, 1.4)));
@@ -368,7 +370,7 @@ W.photo = async (w, fam) => {
   const file = set[slot % set.length];
   const v = DATA.photoVersion || 1;
   const img = await fetchCached(`${BASE}${file}?v=${v}`, `photo_v${v}_${file}`, 'image', 60 * 24 * 60);
-  w.backgroundImage = composeBackground(img, fam, 0);
+  w.backgroundImage = composeBackground(img, fam, 0, (DATA.photoFocus || {})[file]);
   w.url = BASE;
   w.refreshAfterDate = new Date((slot + 1) * block);
   // Small widgets are one big tap target, so the button only fits medium and up

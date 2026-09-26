@@ -59,6 +59,16 @@
       "9.jpg"
     ]
   },
+  "photoFocus": {
+    "1.jpg": [
+      0.5,
+      0.75
+    ],
+    "8.jpg": [
+      0,
+      1
+    ]
+  },
   "milestones": [
     {
       "emoji": "✈️",
