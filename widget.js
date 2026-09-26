@@ -478,12 +478,7 @@ function heroCountdown(parent, m, fam) {
   card.backgroundColor = TILE;
   card.cornerRadius = 16;
   card.setPadding(10, 12, 10, 12);
-  const head = mid(card);
-  txt(head, m.emoji, F.r(small ? 16 : 22), INK);
-  head.addSpacer(6);
-  const names = head.addStack();
-  names.layoutVertically();
-  names.centerAlignContent();
+  const names = midCol(card);
   txt(names, m.name, F.b(small ? 13 : 16), INK, { lines: 1, scale: 0.7 });
   txt(names, fmtDate(m.date, 'd MMMM yyyy'), F.m(small ? 9 : 11), INK_SOFT, { lines: 1 });
   card.addSpacer(6);
@@ -491,11 +486,9 @@ function heroCountdown(parent, m, fam) {
     txt(mid(card), 'Today! 🎉', F.h(small ? 22 : 30), PINK);
     return;
   }
+  const big = F.h(small ? 26 : 40);
   const row = mid(card);
-  row.bottomAlignContent();
-  txt(row, `${m.days - 1}`, F.h(small ? 28 : 40), ACCENT, { lines: 1, scale: 0.6 });
-  row.addSpacer(4);
-  txt(row, m.days - 1 === 1 ? 'day' : 'days', F.sb(small ? 11 : 14), INK_MID);
+  txt(row, `${m.days - 1} ${m.days - 1 === 1 ? 'day' : 'days'}`, big, ACCENT, { lines: 1, scale: 0.6 });
   const t = mid(card).addDate(nextMidnight());
   t.applyTimerStyle();
   t.centerAlignText();
@@ -512,15 +505,12 @@ W.countdown = async (w, fam) => {
   if (!list.length) { txt(mid(w), 'Nothing to count down to yet 💙', F.sb(13), INK); return; }
   const n = Math.min(SLOT, list.length - 1);
   const top = mid(w);
+  const fly = fam === 'small' ? 16 : 24;
+  await sticker(top, fly, 'butterfly');
+  top.addSpacer(6);
   eyebrow(top, 'counting down');
-  if (list.length > 1) {
-    top.addSpacer(6);
-    txt(top, `${n + 1} of ${list.length}`, F.sb(10), INK_SOFT);
-  }
-  if (fam !== 'small') {
-    top.addSpacer(6);
-    await sticker(top, 24, 'butterfly');
-  }
+  top.addSpacer(6);
+  await sticker(top, fly, 'butterfly');
   w.addSpacer(6);
   heroCountdown(w, list[n], fam);
   const after = list[n + 1];
