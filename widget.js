@@ -11,7 +11,7 @@
 let BASE = '';
 let DATA = null;
 let SLOT = 0; // "countdown 2" shows the 2nd soonest, for swiping through a widget stack
-const VERSION = 'Sep 25 · light'; // shown in the preview menu, so you can tell which copy her iPad is running
+const VERSION = 'Sep 25 · weather backup'; // shown in the preview menu, so you can tell which copy her iPad is running
 
 // ─────────────────────────────────────────────────────────────
 //  THEME (matches the extension's blues)
@@ -121,7 +121,7 @@ async function sticker(stack, size, pick) {
 const fm = FileManager.local();
 const CACHE = fm.joinPath(fm.cacheDirectory(), 'awu');
 
-async function fetchCached(url, name, kind, maxAgeMin) {
+async function fetchCached(url, name, kind, maxAgeMin, opts = {}) {
   if (!fm.fileExists(CACHE)) fm.createDirectory(CACHE, true);
   const p = fm.joinPath(CACHE, name.replace(/[^a-z0-9._-]/gi, '_'));
   const read = () => (kind === 'json' ? JSON.parse(fm.readString(p)) : fm.readImage(p));
@@ -131,7 +131,8 @@ async function fetchCached(url, name, kind, maxAgeMin) {
   }
   try {
     const req = new Request(url);
-    req.timeoutInterval = 12;
+    req.timeoutInterval = opts.timeout || 12;
+    if (opts.headers) req.headers = opts.headers;
     if (kind === 'json') {
       const j = await req.loadJSON();
       if (req.response && req.response.statusCode >= 400) throw new Error('HTTP ' + req.response.statusCode);
@@ -286,9 +287,52 @@ async function songOfDay() {
   return { url: openUrl, title: info.title || 'Song of the Day', art };
 }
 
+let WX_ERROR = ''; // last weather failure, shown in small print so we can tell why
+
+// MET Norway symbol names -> the same weather codes Open-Meteo uses
+function metnoCode(sym) {
+  const s = sym.replace(/_(day|night|polartwilight)$/, '');
+  if (s === 'clearsky') return 0;
+  if (s === 'fair') return 1;
+  if (s === 'partlycloudy') return 2;
+  if (s === 'cloudy') return 3;
+  if (s === 'fog') return 45;
+  if (s.includes('thunder')) return 95;
+  if (s.includes('snow')) return s.includes('showers') ? 85 : 73;
+  if (s.includes('sleet')) return 67;
+  if (s.includes('showers')) return 80;
+  if (s.includes('heavyrain')) return 65;
+  if (s.includes('lightrain')) return 61;
+  if (s.includes('rain')) return 63;
+  return 3;
+}
+
+// Backup source, reshaped to look like an Open-Meteo reply
+async function metnoWeather(p, name) {
+  const u = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${p.lat.toFixed(3)}&lon=${p.lon.toFixed(3)}`;
+  const j = await fetchCached(u, 'metno_' + name, 'json', 20, { timeout: 20, headers: { 'User-Agent': 'AlwaysWithYou/1.0 github.com/realplayer369' } });
+  const ts = j.properties.timeseries;
+  const now = ts[0].data;
+  const sym = ((now.next_1_hours || now.next_6_hours || {}).summary || {}).symbol_code || 'cloudy';
+  const next24 = ts.slice(0, 24).map(t => t.data.instant.details.air_temperature);
+  return {
+    current: { temperature_2m: now.instant.details.air_temperature, weather_code: metnoCode(sym), is_day: /_night$/.test(sym) ? 0 : 1 },
+    daily: { temperature_2m_max: [Math.max(...next24)], temperature_2m_min: [Math.min(...next24)] },
+  };
+}
+
 async function weatherFor(p, name) {
   const u = `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current=temperature_2m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`;
-  return fetchCached(u, name, 'json', 20);
+  try {
+    return await fetchCached(u, name, 'json', 20, { timeout: 20 });
+  } catch (e) {
+    try {
+      return await metnoWeather(p, name);
+    } catch (e2) {
+      WX_ERROR = `open-meteo: ${e.message || e} / met.no: ${e2.message || e2}`;
+      throw e2;
+    }
+  }
 }
 
 function wxInfo(code, isDay) {
@@ -422,6 +466,7 @@ function weatherColumn(parent, person, wx, tz) {
     // Weather didn't load this time: keep the clock, try again soon
     txt(c, '—°', F.b(32), INK_SOFT);
     txt(c, 'weather on its way', F.m(12), INK_MID, { lines: 1, scale: 0.7 });
+    if (WX_ERROR) txt(c, WX_ERROR.slice(0, 90), F.r(7), INK_SOFT, { lines: 2, align: 'center' });
     c.addSpacer(2);
     liveClock(c, tz, F.sb(11), ACCENT).centerAlignText();
     return;
