@@ -11,7 +11,7 @@
 let BASE = '';
 let DATA = null;
 let SLOT = 0; // "countdown 2" shows the 2nd soonest, for swiping through a widget stack
-const VERSION = 'Sep 25 · weather backup'; // shown in the preview menu, so you can tell which copy her iPad is running
+const VERSION = 'Sep 26 · daily weather'; // shown in the preview menu, so you can tell which copy her iPad is running
 
 // ─────────────────────────────────────────────────────────────
 //  THEME (matches the extension's blues)
@@ -307,27 +307,33 @@ function metnoCode(sym) {
   return 3;
 }
 
-// Backup source, reshaped to look like an Open-Meteo reply
-async function metnoWeather(p, name) {
+// Weather is a once-a-day forecast: fetched after midnight in that city, then reused all day.
+// Returns { code, max, min } for the city's current local date.
+const localYmd = tz => { const p = tzParts(new Date(), tz); return `${p.y}-${pad(p.mo)}-${pad(p.d)}`; };
+
+// Backup source (MET Norway): today's high, low and midday weather
+async function metnoDay(p, key) {
   const u = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${p.lat.toFixed(3)}&lon=${p.lon.toFixed(3)}`;
-  const j = await fetchCached(u, 'metno_' + name, 'json', 20, { timeout: 20, headers: { 'User-Agent': 'AlwaysWithYou/1.0 github.com/realplayer369' } });
-  const ts = j.properties.timeseries;
-  const now = ts[0].data;
-  const sym = ((now.next_1_hours || now.next_6_hours || {}).summary || {}).symbol_code || 'cloudy';
-  const next24 = ts.slice(0, 24).map(t => t.data.instant.details.air_temperature);
-  return {
-    current: { temperature_2m: now.instant.details.air_temperature, weather_code: metnoCode(sym), is_day: /_night$/.test(sym) ? 0 : 1 },
-    daily: { temperature_2m_max: [Math.max(...next24)], temperature_2m_min: [Math.min(...next24)] },
-  };
+  const j = await fetchCached(u, 'metno_' + key, 'json', 24 * 60, { timeout: 20, headers: { 'User-Agent': 'AlwaysWithYou/1.0 github.com/realplayer369' } });
+  const today = localYmd(p.tz);
+  const all = j.properties.timeseries;
+  const day = all.filter(t => { const q = tzParts(new Date(t.time), p.tz); return `${q.y}-${pad(q.mo)}-${pad(q.d)}` === today; });
+  const ts = day.length ? day : all.slice(0, 24);
+  const temps = ts.map(t => t.data.instant.details.air_temperature);
+  const noon = ts.find(t => tzParts(new Date(t.time), p.tz).h >= 12 && t.data.next_6_hours) || ts.find(t => t.data.next_6_hours) || ts[0];
+  const sym = ((noon.data.next_6_hours || noon.data.next_1_hours || {}).summary || {}).symbol_code || 'cloudy';
+  return { code: metnoCode(sym), max: Math.max(...temps), min: Math.min(...temps) };
 }
 
 async function weatherFor(p, name) {
-  const u = `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current=temperature_2m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`;
+  const key = `${name.replace('.json', '')}_${localYmd(p.tz)}.json`;
+  const u = `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`;
   try {
-    return await fetchCached(u, name, 'json', 20, { timeout: 20 });
+    const j = await fetchCached(u, key, 'json', 24 * 60, { timeout: 20 });
+    return { code: j.daily.weather_code[0], max: j.daily.temperature_2m_max[0], min: j.daily.temperature_2m_min[0] };
   } catch (e) {
     try {
-      return await metnoWeather(p, name);
+      return await metnoDay(p, key);
     } catch (e2) {
       WX_ERROR = `open-meteo: ${e.message || e} / met.no: ${e2.message || e2}`;
       throw e2;
@@ -471,18 +477,19 @@ function weatherColumn(parent, person, wx, tz) {
     liveClock(c, tz, F.sb(11), ACCENT).centerAlignText();
     return;
   }
-  const cur = wx.current, info = wxInfo(cur.weather_code, cur.is_day === 1);
+  // Today's forecast: the big number is the day's high
+  const info = wxInfo(wx.code, true);
   const r = c.addStack();
   r.centerAlignContent();
   symbol(r, info.sym, 26, info.sunny ? new Color('#f5b83d') : new Color('#45a8e8'));
   r.addSpacer(6);
-  txt(r, `${Math.round(cur.temperature_2m)}°`, F.b(32), INK);
+  txt(r, `${Math.round(wx.max)}°`, F.b(32), INK);
   if (tz) {
     r.addSpacer(4);
-    txt(r, `${Math.round(cur.temperature_2m * 9 / 5 + 32)}°F`, F.m(11), INK_SOFT);
+    txt(r, `${toF(wx.max)}°F`, F.m(11), INK_SOFT);
   }
-  txt(c, info.label, F.m(12), INK_MID, { lines: 1 });
-  txt(c, `H ${Math.round(wx.daily.temperature_2m_max[0])}°  L ${Math.round(wx.daily.temperature_2m_min[0])}°`, F.m(11), INK_SOFT);
+  txt(c, `${info.label} today`, F.m(12), INK_MID, { lines: 1, scale: 0.7 });
+  txt(c, `H ${Math.round(wx.max)}°  L ${Math.round(wx.min)}°`, F.m(11), INK_SOFT);
   c.addSpacer(2);
   liveClock(c, tz, F.sb(11), ACCENT).centerAlignText();
 }
@@ -497,7 +504,7 @@ W.weather = async (w, fam) => {
   if (fam === 'small') {
     weatherColumn(mid(w), DATA.her, a, null);
     w.addSpacer();
-    if (b) txt(mid(w), `${DATA.joshua.name}: ${Math.round(b.current.temperature_2m)}° · ${wxInfo(b.current.weather_code, b.current.is_day === 1).label}`, F.sb(10), INK_SOFT, { lines: 1, scale: 0.7 });
+    if (b) txt(mid(w), `${DATA.joshua.name}: ${Math.round(b.max)}° · ${wxInfo(b.code, true).label}`, F.sb(10), INK_SOFT, { lines: 1, scale: 0.7 });
   } else {
     w.addSpacer();
     const row = w.addStack();
@@ -516,7 +523,9 @@ W.weather = async (w, fam) => {
     w.addSpacer();
   }
   w.url = BASE;
-  w.refreshAfterDate = earliest(nextMidnight(), minutesFromNow(a && b ? 30 : 10));
+  // Redraw just after midnight in whichever city hits it first; retry sooner if a forecast is missing
+  const hisMidnight = new Date(midnightIn(DATA.joshua.tz).getTime() + 86400000 + 120000);
+  w.refreshAfterDate = a && b ? earliest(nextMidnight(), hisMidnight) : minutesFromNow(30);
 };
 
 // ⏳ Countdowns, the top one ticks live
@@ -909,7 +918,7 @@ function convRow(parent, pairs) {
 async function conversions() {
   const r = await fetchCached('https://api.frankfurter.dev/v1/latest?from=AUD&to=USD', 'rate_aud_usd.json', 'json', 180);
   let herC = null;
-  try { herC = Math.round((await weatherFor(DATA.her, 'wx_her.json')).current.temperature_2m); } catch (e) {}
+  try { herC = Math.round((await weatherFor(DATA.her, 'wx_her.json')).max); } catch (e) {}
   const km = Number(String(DATA.distance.km).replace(/,/g, ''));
   return { rate: r.rates.USD, updated: fmtDate(parseDate(r.date), 'd MMM'), herC, km };
 }
@@ -921,7 +930,7 @@ W.rates = async (w, fam) => {
   const rows = [
     { head: '💱 exchange rate', main: `A$1 = $${c.rate.toFixed(4)} USD`, sub: `$1 = A$${(1 / c.rate).toFixed(4)} · updated ${c.updated}`,
       tiles: [10, 20, 50, 100].map(a => [`A$${a}`, `$${(a * c.rate).toFixed(2)}`]) },
-    { head: '🌡️ temperature', main: c.herC == null ? '20°C = 68°F' : `${c.herC}°C = ${toF(c.herC)}°F`, sub: c.herC == null ? '' : `right now in ${DATA.her.city}`,
+    { head: '🌡️ temperature', main: c.herC == null ? '20°C = 68°F' : `${c.herC}°C = ${toF(c.herC)}°F`, sub: c.herC == null ? '' : `today's high in ${DATA.her.city}`,
       tiles: [0, 10, 20, 30].map(t => [`${t}°C`, `${toF(t)}°F`]) },
     { head: '📏 distance', main: `${DATA.distance.km} km = ${DATA.distance.mi} mi`, sub: `${DATA.distance.label}, and still right here`,
       tiles: [1, 5, 10, 100].map(k => [`${k} km`, `${num(toMi(k), 1)} mi`]) },
