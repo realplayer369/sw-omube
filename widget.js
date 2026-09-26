@@ -391,11 +391,13 @@ W.note = async (w, fam) => {
   const small = fam === 'small', big = fam === 'large' || fam === 'extraLarge';
   const n = noteOfDay();
   const top = mid(w);
-  const dolphin = small ? 18 : 24;
+  // Dolphin on both sides; sizes kept small enough that both fit on the small widget
+  const dolphin = small ? 16 : 24, gap = small ? 3 : 6;
+  if (small) w.setPadding(12, 10, 12, 10);
   await sticker(top, dolphin, 'dolphin');
-  top.addSpacer(6);
-  txt(top, n.special ? 'Just For Today' : 'For You Today', F.comic(small ? 13 : 18), ACCENT, { lines: 1, scale: 0.6 });
-  top.addSpacer(6);
+  top.addSpacer(gap);
+  txt(top, n.special ? 'Just For Today' : 'For You Today', F.comic(small ? 12 : 18), ACCENT, { lines: 1, scale: 0.5 });
+  top.addSpacer(gap);
   await sticker(top, dolphin, 'dolphin');
   w.addSpacer();
   txt(mid(w), n.text, F.serif(small ? 13 : big ? 24 : 17), INK, { scale: 0.5, lines: small ? 5 : 6, align: 'center' });
@@ -510,14 +512,14 @@ W.countdown = async (w, fam) => {
   if (!list.length) { txt(mid(w), 'Nothing to count down to yet 💙', F.sb(13), INK); return; }
   const n = Math.min(SLOT, list.length - 1);
   const top = mid(w);
-  if (fam !== 'small') {
-    await sticker(top, 24, 'butterfly');
-    top.addSpacer(6);
-  }
   eyebrow(top, 'counting down');
   if (list.length > 1) {
     top.addSpacer(6);
     txt(top, `${n + 1} of ${list.length}`, F.sb(10), INK_SOFT);
+  }
+  if (fam !== 'small') {
+    top.addSpacer(6);
+    await sticker(top, 24, 'butterfly');
   }
   w.addSpacer(6);
   heroCountdown(w, list[n], fam);
