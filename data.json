@@ -598,6 +598,16 @@
   "snapchat": "joshua07jh",
   "links": [
     {
+      "emoji": "🏡",
+      "label": "Love Nest",
+      "url": "https://lovenest-futureweb.vercel.app/"
+    },
+    {
+      "emoji": "📖",
+      "label": "Our Book",
+      "url": "https://docs.google.com/document/d/16CY6kzaU3A9GsQaM2zfB4PS1UwX-37VIFMTitgM2fT4/edit?usp=sharing"
+    },
+    {
       "emoji": "🎮",
       "label": "Our Game",
       "url": "https://iloveyoumost.lovable.app/"
@@ -611,16 +621,6 @@
       "emoji": "💝",
       "label": "2nd Valentines",
       "url": "https://valentinesquestion.vercel.app/"
-    },
-    {
-      "emoji": "📖",
-      "label": "Our Book",
-      "url": "https://docs.google.com/document/d/16CY6kzaU3A9GsQaM2zfB4PS1UwX-37VIFMTitgM2fT4/edit?usp=sharing"
-    },
-    {
-      "emoji": "🏡",
-      "label": "Love Nest",
-      "url": "https://lovenest-futureweb.vercel.app/"
     },
     {
       "emoji": "💗",

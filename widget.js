@@ -337,12 +337,14 @@ function grid(parent, items, cols, o = {}) {
       tile.centerAlignContent();
       tile.setPadding(o.padV || 8, o.padH || 10, o.padV || 8, o.padH || 8);
       tile.cornerRadius = 12;
+      // Emoji + name sit in the middle of the tile; wrapped names are centered line by line
+      tile.addSpacer();
       if (it) {
         tile.backgroundColor = TILE;
         tile.url = it.url;
         txt(tile, it.emoji, F.r(o.emoji || 15), INK);
         tile.addSpacer(o.padH ? 4 : 6);
-        txt(tile, it.label, F.sb(o.font || 12), INK, { lines: o.lines || 1, scale: o.lines > 1 ? 0.8 : 0.6 });
+        txt(tile, it.label, F.sb(o.font || 12), INK, { lines: o.lines || 1, scale: o.lines > 1 ? 0.8 : 0.6, align: 'center' });
       }
       tile.addSpacer();
     }
