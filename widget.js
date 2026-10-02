@@ -483,11 +483,9 @@ function weatherColumn(parent, person, wx, tz) {
   r.centerAlignContent();
   symbol(r, info.sym, 26, info.sunny ? new Color('#f5b83d') : new Color('#45a8e8'));
   r.addSpacer(6);
-  txt(r, `${Math.round(wx.max)}°`, F.b(32), INK);
-  if (tz) {
-    r.addSpacer(4);
-    txt(r, `${toF(wx.max)}°F`, F.m(11), INK_SOFT);
-  }
+  txt(r, `${Math.round(wx.max)}°`, F.b(32), INK, { lines: 1, scale: 0.6 });
+  // °F on its own line so the big number never gets cut off
+  if (tz) txt(c, `${toF(wx.max)}°F`, F.m(11), INK_SOFT);
   txt(c, `${info.label} today`, F.m(12), INK_MID, { lines: 1, scale: 0.7 });
   txt(c, `H ${Math.round(wx.max)}°  L ${Math.round(wx.min)}°`, F.m(11), INK_SOFT);
   c.addSpacer(2);
@@ -512,11 +510,15 @@ W.weather = async (w, fam) => {
     row.addSpacer();
     weatherColumn(row, DATA.her, a, null);
     row.addSpacer();
+    // Fixed width so the heart, distance and "km" all sit on the same center line
     const m = row.addStack();
     m.layoutVertically();
     m.centerAlignContent();
-    txt(m, '💙', F.r(16), INK, { align: 'center' });
-    txt(m, `${DATA.distance.km} km`, F.m(9), INK_SOFT, { align: 'center' });
+    m.size = new Size(56, 0);
+    txt(m, '💙', F.r(18), INK, { align: 'center' });
+    m.addSpacer(2);
+    txt(m, DATA.distance.km, F.sb(10), INK_SOFT, { align: 'center', lines: 1, scale: 0.7 });
+    txt(m, 'km', F.m(9), INK_SOFT, { align: 'center' });
     row.addSpacer();
     weatherColumn(row, DATA.joshua, b, DATA.joshua.tz);
     row.addSpacer();
