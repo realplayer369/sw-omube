@@ -638,7 +638,7 @@
     {
       "emoji": "🤖",
       "label": "ChatGPT",
-      "url": "https://chatgpt.com/"
+      "url": "chatgpt://"
     }
   ]
 }
